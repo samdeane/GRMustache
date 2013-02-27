@@ -64,10 +64,16 @@
 @interface GRMustacheCompiler : NSObject<GRMustacheParserDelegate> {
 @private
     NSError *_fatalError;
-    NSMutableArray *_componentsStack;
-    NSMutableArray *_openingTokenStack;
+    
     NSMutableArray *_currentComponents;
+    NSMutableArray *_componentsStack;
+    
     GRMustacheToken *_currentOpeningToken;
+    NSMutableArray *_openingTokenStack;
+    
+    NSObject *_currentTagValue;
+    NSMutableArray *_tagValueStack;
+    
     GRMustacheTemplateRepository *_templateRepository;
     GRMustacheContentType _contentType;
     BOOL _contentTypeLocked;

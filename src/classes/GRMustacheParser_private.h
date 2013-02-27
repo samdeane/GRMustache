@@ -131,4 +131,22 @@
  */
 + (GRMustacheExpression *)parseExpression:(NSString *)string invalid:(BOOL *)outInvalid GRMUSTACHE_API_INTERNAL;
 
+/**
+ * Returns a template name from a string.
+ *
+ * @param string  A string.
+ *
+ * @return a template name, or nil if the string is not a partial name.
+ */
++ (NSString *)parseTemplateName:(NSString *)string GRMUSTACHE_API_INTERNAL;
+
+/**
+ * Returns a pragma from a string
+ *
+ * @param string  A string
+ *
+ * @return a pragma, or nil if the string is not a pragma.
+ */
++ (NSString *)parsePragma:(NSString *)string GRMUSTACHE_API_INTERNAL;
+
 @end
