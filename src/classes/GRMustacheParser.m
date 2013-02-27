@@ -419,6 +419,7 @@
                             tagInnerRange = (NSRange){ .location = start+tagStartDelimiterLength+1, .length = i-(start+tagStartDelimiterLength+1) };
                             break;
                         case '=':
+#warning Find a fix for https://github.com/groue/GRMustache/issues/38
                             type = GRMustacheTokenTypeSetDelimiter;
                             tagInnerRange = (NSRange){ .location = start+tagStartDelimiterLength+1, .length = i-(start+tagStartDelimiterLength+1) };
                             
