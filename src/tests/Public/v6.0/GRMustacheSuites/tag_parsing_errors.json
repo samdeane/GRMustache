@@ -2,6 +2,66 @@
   "tests": [
 
     {
+      "name": "Variable tags must be closed.",
+      "data": null,
+      "template": "\n{{\n",
+      "expected_error": "Parse error.*line 2\\b"
+    },
+    {
+      "name": "Triple mustache tags must be closed.",
+      "data": null,
+      "template": "\n{{{#\n",
+      "expected_error": "Parse error.*line 2\\b"
+    },
+    {
+      "name": "Unescaped variable tags must be closed.",
+      "data": null,
+      "template": "\n{{&\n",
+      "expected_error": "Parse error.*line 2\\b"
+    },
+    {
+      "name": "Section tags must be closed.",
+      "data": null,
+      "template": "\n{{#\n",
+      "expected_error": "Parse error.*line 2\\b"
+    },
+    {
+      "name": "Inverted section tags must be closed.",
+      "data": null,
+      "template": "\n{{^\n",
+      "expected_error": "Parse error.*line 2\\b"
+    },
+    {
+      "name": "Overridable section tags must be closed.",
+      "data": null,
+      "template": "\n{{$\n",
+      "expected_error": "Parse error.*line 2\\b"
+    },
+    {
+      "name": "Partial tags must be closed.",
+      "data": null,
+      "template": "\n{{>\n",
+      "expected_error": "Parse error.*line 2\\b"
+    },
+    {
+      "name": "Comment tags must be closed.",
+      "data": null,
+      "template": "\n{{!\n",
+      "expected_error": "Parse error.*line 2\\b"
+    },
+    {
+      "name": "Set delimiter tags must be closed.",
+      "data": null,
+      "template": "\n{{=\n",
+      "expected_error": "Parse error.*line 2\\b"
+    },
+    {
+      "name": "Pragma tags must be closed.",
+      "data": null,
+      "template": "\n{{%\n",
+      "expected_error": "Parse error.*line 2\\b"
+    },
+    {
       "name": "Variable tags can not be empty.",
       "data": null,
       "template": "\n{{}}",
@@ -88,44 +148,44 @@
     {
       "name": "Quadruple mustaches yield a parse error.",
       "data": null,
-      "template": "\n{{{{foo}}}}",
+      "template": "\n{{{{\nfoo\n}}}}",
       "expected_error": "Parse error.*line 2\\b"
     },
     {
-      "name": "Section tag must be closed.",
+      "name": "Sections must be closed.",
       "data": null,
-      "template": "\n{{#a}}",
+      "template": "\n{{#\na\n}}",
       "expected_error": "Parse error.*line 2\\b"
     },
     {
       "name": "Closing section tag which contain an expression must match the opening tag.",
       "data": null,
-      "template": "\n{{#a}}\n{{/b}}",
-      "expected_error": "Parse error.*line 3\\b"
+      "template": "\n{{#\na\n}}\n{{/\nb\n}}",
+      "expected_error": "Parse error.*line 5\\b"
     },
     {
       "name": "Closing section tag which contain an expression must match the opening tag.",
       "data": null,
-      "template": "\n{{#a(b)}}\n{{/a}}",
-      "expected_error": "Parse error.*line 3\\b"
+      "template": "\n{{#\na(b)\n}}\n{{/\na\n}}",
+      "expected_error": "Parse error.*line 5\\b"
     },
     {
       "name": "Closing section tag which contain an expression must match the opening tag.",
       "data": null,
-      "template": "\n{{#a}}\n{{/a(b)}}",
-      "expected_error": "Parse error.*line 3\\b"
+      "template": "\n{{#\na\n}}\n{{/\na(b)\n}}",
+      "expected_error": "Parse error.*line 5\\b"
     },
     {
       "name": "Closing section tag which contain an expression must match the opening tag.",
       "data": null,
-      "template": "\n{{#a.b}}\n{{/a}}",
-      "expected_error": "Parse error.*line 3\\b"
+      "template": "\n{{#\na.b\n}}\n{{/\na\n}}",
+      "expected_error": "Parse error.*line 5\\b"
     },
     {
       "name": "Closing section tag which contain an expression must match the opening tag.",
       "data": null,
-      "template": "\n{{#a}}\n{{/a.b}}",
-      "expected_error": "Parse error.*line 3\\b"
+      "template": "\n{{#\na\n}}\n{{/\na.b\n}}",
+      "expected_error": "Parse error.*line 5\\b"
     }
   ]
 }

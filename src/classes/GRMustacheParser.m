@@ -103,27 +103,35 @@
         stateContent,
         stateTag,
         stateUnescapedTag,
+        stateSetDelimitersTag,
     } state = stateStart;
     
-    NSString *unescapedTagStartDelimiter = [NSString stringWithFormat:@"%@{", self.tagStartDelimiter];
-    NSString *unescapedTagEndDelimiter = [NSString stringWithFormat:@"}%@", self.tagEndDelimiter];
-
     UniChar tagStartDelimiterCharacter = [self.tagStartDelimiter characterAtIndex:0];
     NSUInteger tagStartDelimiterLength = self.tagStartDelimiter.length;
     UniChar tagEndDelimiterCharacter = [self.tagEndDelimiter characterAtIndex:0];
     NSUInteger tagEndDelimiterLength = self.tagEndDelimiter.length;
     
+    NSString *unescapedTagStartDelimiter = [NSString stringWithFormat:@"%@{", self.tagStartDelimiter];
+    NSString *unescapedTagEndDelimiter = [NSString stringWithFormat:@"}%@", self.tagEndDelimiter];
     UniChar unescapedTagStartDelimiterCharacter = [unescapedTagStartDelimiter characterAtIndex:0];
     NSUInteger unescapedTagStartDelimiterLength = unescapedTagStartDelimiter.length;
     UniChar unescapedTagEndDelimiterCharacter = [unescapedTagEndDelimiter characterAtIndex:0];
     NSUInteger unescapedTagEndDelimiterLength = unescapedTagEndDelimiter.length;
+    
+    NSString *setDelimitersTagStartDelimiter = [NSString stringWithFormat:@"%@=", self.tagStartDelimiter];
+    NSString *setDelimitersTagEndDelimiter = [NSString stringWithFormat:@"=%@", self.tagEndDelimiter];
+    UniChar setDelimitersTagStartDelimiterCharacter = [setDelimitersTagStartDelimiter characterAtIndex:0];
+    NSUInteger setDelimitersTagStartDelimiterLength = setDelimitersTagStartDelimiter.length;
+    UniChar setDelimitersTagEndDelimiterCharacter = [setDelimitersTagEndDelimiter characterAtIndex:0];
+    NSUInteger setDelimitersTagEndDelimiterLength = setDelimitersTagEndDelimiter.length;
     
     NSCharacterSet *whitespaceCharacterSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
     GRMustacheToken *lastToken = nil;
     NSUInteger start = 0;
     NSUInteger lineStart = 0;
     NSUInteger i = 0;
-    NSUInteger line = 1;
+    NSUInteger lineNumber = 1;
+    NSUInteger tagStartLineNumber = 1;
     for (; i<length; ++i) {
         UniChar c = characters[i];
         switch (state) {
@@ -145,7 +153,7 @@
                         GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankLine
                                                                  templateString:templateString
                                                                      templateID:templateID
-                                                                           line:line
+                                                                           line:lineNumber
                                                                           range:(NSRange){ .location = lineStart, .length = (i+1)-lineStart}];
                         if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     } else {
@@ -158,22 +166,31 @@
                         GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankEndOfLine
                                                                  templateString:templateString
                                                                      templateID:templateID
-                                                                           line:line
+                                                                           line:lineNumber
                                                                           range:(NSRange){ .location = start, .length = (i+1)-start}];
                         if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     }
-                    ++line;
+                    ++lineNumber;
                     lineStart = start = i + 1;
                     state = stateStart;
                 }
                 else if (c == unescapedTagStartDelimiterCharacter && (i+unescapedTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, unescapedTagStartDelimiterLength)] isEqualToString:unescapedTagStartDelimiter])
                 {
+                    tagStartLineNumber = lineNumber;
                     start = i;
                     state = stateUnescapedTag;
                     i += unescapedTagStartDelimiterLength - 1;
                 }
+                else if (c == setDelimitersTagStartDelimiterCharacter && (i+setDelimitersTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagStartDelimiterLength)] isEqualToString:setDelimitersTagStartDelimiter])
+                {
+                    tagStartLineNumber = lineNumber;
+                    start = i;
+                    state = stateSetDelimitersTag;
+                    i += setDelimitersTagStartDelimiterLength - 1;
+                }
                 else if (c == tagStartDelimiterCharacter && (i+tagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, tagStartDelimiterLength)] isEqualToString:self.tagStartDelimiter])
                 {
+                    tagStartLineNumber = lineNumber;
                     start = i;
                     state = stateTag;
                     i += tagStartDelimiterLength - 1;
@@ -201,7 +218,7 @@
                         GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankLine
                                                                  templateString:templateString
                                                                      templateID:templateID
-                                                                           line:line
+                                                                           line:lineNumber
                                                                           range:(NSRange){ .location = lineStart, .length = (i+1)-lineStart}];
                         if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     } else {
@@ -214,11 +231,11 @@
                         GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankEndOfLine
                                                                  templateString:templateString
                                                                      templateID:templateID
-                                                                           line:line
+                                                                           line:lineNumber
                                                                           range:(NSRange){ .location = start, .length = (i+1)-start}];
                         if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     }
-                    ++line;
+                    ++lineNumber;
                     lineStart = start = i + 1;
                     state = stateStart;
                 }
@@ -235,7 +252,7 @@
                             GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankPrefix
                                                                      templateString:templateString
                                                                          templateID:templateID
-                                                                               line:line
+                                                                               line:lineNumber
                                                                               range:(NSRange){ .location = start, .length = i-start}];
                             if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                         } else {
@@ -251,14 +268,54 @@
                                 lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
                                                             templateString:templateString
                                                                 templateID:templateID
-                                                                      line:line
+                                                                      line:lineNumber
                                                                      range:(NSRange){ .location = start, .length = i-start}];
                             }
                         }
                     }
+                    tagStartLineNumber = lineNumber;
                     start = i;
                     state = stateUnescapedTag;
                     i += unescapedTagStartDelimiterLength - 1;
+                }
+                else if (c == setDelimitersTagStartDelimiterCharacter && (i+setDelimitersTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagStartDelimiterLength)] isEqualToString:setDelimitersTagStartDelimiter])
+                {
+                    if (start != i) {
+                        if (lineStart == start) {
+                            // Blank prefix
+                            // Blank prefix do not coalesce: consume last token.
+                            if (lastToken) {
+                                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
+                                lastToken = nil;
+                            }
+                            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankPrefix
+                                                                     templateString:templateString
+                                                                         templateID:templateID
+                                                                               line:lineNumber
+                                                                              range:(NSRange){ .location = start, .length = i-start}];
+                            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
+                        } else {
+                            // Content
+                            // Content coalesce
+                            if (lastToken) {
+                                if (lastToken.type == GRMustacheTokenTypeContent) {
+                                    lastToken.range = (NSRange){ .location = lastToken.range.location, .length = i-lastToken.range.location };
+                                } else {
+                                    if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
+                                }
+                            } else {
+                                lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                            templateString:templateString
+                                                                templateID:templateID
+                                                                      line:lineNumber
+                                                                     range:(NSRange){ .location = start, .length = i-start}];
+                            }
+                        }
+                    }
+                    tagStartLineNumber = lineNumber;
+                    start = i;
+                    state = stateSetDelimitersTag;
+                    i += setDelimitersTagStartDelimiterLength - 1;
                 }
                 else if (c == tagStartDelimiterCharacter && (i+tagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, tagStartDelimiterLength)] isEqualToString:self.tagStartDelimiter])
                 {
@@ -273,7 +330,7 @@
                             GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankPrefix
                                                                      templateString:templateString
                                                                          templateID:templateID
-                                                                               line:line
+                                                                               line:lineNumber
                                                                               range:(NSRange){ .location = start, .length = i-start}];
                             if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                         } else {
@@ -289,11 +346,12 @@
                                 lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
                                                             templateString:templateString
                                                                 templateID:templateID
-                                                                      line:line
+                                                                      line:lineNumber
                                                                      range:(NSRange){ .location = start, .length = i-start}];
                             }
                         }
                     }
+                    tagStartLineNumber = lineNumber;
                     start = i;
                     state = stateTag;
                     i += tagStartDelimiterLength - 1;
@@ -320,11 +378,11 @@
                             lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
                                                         templateString:templateString
                                                             templateID:templateID
-                                                                  line:line
+                                                                  line:lineNumber
                                                                  range:(NSRange){ .location = start, .length = (i+1)-start}];
                         }
                     }
-                    ++line;
+                    ++lineNumber;
                     lineStart = start = i + 1;
                     state = stateStart;
                 }
@@ -343,13 +401,38 @@
                             lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
                                                         templateString:templateString
                                                             templateID:templateID
-                                                                  line:line
+                                                                  line:lineNumber
                                                                  range:(NSRange){ .location = start, .length = i-start}];
                         }
                     }
+                    tagStartLineNumber = lineNumber;
                     start = i;
                     state = stateUnescapedTag;
                     i += unescapedTagStartDelimiterLength - 1;
+                }
+                else if (c == setDelimitersTagStartDelimiterCharacter && (i+setDelimitersTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagStartDelimiterLength)] isEqualToString:setDelimitersTagStartDelimiter])
+                {
+                    if (start != i) {
+                        // Content
+                        // Content coalesce
+                        if (lastToken) {
+                            if (lastToken.type == GRMustacheTokenTypeContent) {
+                                lastToken.range = (NSRange){ .location = lastToken.range.location, .length = i-lastToken.range.location };
+                            } else {
+                                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
+                            }
+                        } else {
+                            lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                        templateString:templateString
+                                                            templateID:templateID
+                                                                  line:lineNumber
+                                                                 range:(NSRange){ .location = start, .length = i-start}];
+                        }
+                    }
+                    tagStartLineNumber = lineNumber;
+                    start = i;
+                    state = stateSetDelimitersTag;
+                    i += setDelimitersTagStartDelimiterLength - 1;
                 }
                 else if (c == tagStartDelimiterCharacter && (i+tagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, tagStartDelimiterLength)] isEqualToString:self.tagStartDelimiter])
                 {
@@ -366,10 +449,11 @@
                             lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
                                                         templateString:templateString
                                                             templateID:templateID
-                                                                  line:line
+                                                                  line:lineNumber
                                                                  range:(NSRange){ .location = start, .length = i-start}];
                         }
                     }
+                    tagStartLineNumber = lineNumber;
                     start = i;
                     state = stateTag;
                     i += tagStartDelimiterLength - 1;
@@ -377,7 +461,12 @@
             } break;
                 
             case stateTag: {
-                if (c == tagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, tagEndDelimiterLength)] isEqualToString:self.tagEndDelimiter])
+                if (c == '\n')
+                {
+                    ++lineNumber;
+                    lineStart = i + 1;
+                }
+                else if (c == tagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, tagEndDelimiterLength)] isEqualToString:self.tagEndDelimiter])
                 {
                     // Tag
                     // Tag do not coalesce: consume last token.
@@ -385,7 +474,6 @@
                         if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
                         lastToken = nil;
                     }
-                    NSUInteger currentTagEndDelimiterLength = tagEndDelimiterLength;    // tagEndDelimiterLength may be changed by {{=| |=}}
                     GRMustacheTokenType type = GRMustacheTokenTypeEscapedVariable;
                     UniChar tagInitial = characters[start+tagStartDelimiterLength];
                     NSRange tagInnerRange;
@@ -418,49 +506,6 @@
                             type = GRMustacheTokenTypeOverridablePartial;
                             tagInnerRange = (NSRange){ .location = start+tagStartDelimiterLength+1, .length = i-(start+tagStartDelimiterLength+1) };
                             break;
-                        case '=':
-#warning Find a fix for https://github.com/groue/GRMustache/issues/38
-                            type = GRMustacheTokenTypeSetDelimiter;
-                            tagInnerRange = (NSRange){ .location = start+tagStartDelimiterLength+1, .length = i-(start+tagStartDelimiterLength+1) };
-                            
-                            // set delimiter tags must end with =
-                            if (characters[i-1] != '=') {
-                                [self failWithParseErrorAtLine:line description:@"Invalid set delimiters tag" templateID:templateID];
-                                return;
-                            }
-                            
-                            // extract new delimiters
-                            NSString *innerContent = [templateString substringWithRange:(NSRange){ .location = start+tagStartDelimiterLength+1, .length = i-(start+tagStartDelimiterLength+2) }];
-                            NSArray *newTags = [innerContent componentsSeparatedByCharactersInSet:whitespaceCharacterSet];
-                            NSMutableArray *nonBlankNewTags = [NSMutableArray array];
-                            for (NSString *newTag in newTags) {
-                                if (newTag.length > 0) {
-                                    [nonBlankNewTags addObject:newTag];
-                                }
-                            }
-                            if (nonBlankNewTags.count == 2) {
-                                self.tagStartDelimiter = [nonBlankNewTags objectAtIndex:0];
-                                self.tagEndDelimiter = [nonBlankNewTags objectAtIndex:1];
-                                
-                                // update cache
-                                unescapedTagStartDelimiter = [NSString stringWithFormat:@"%@{", self.tagStartDelimiter];
-                                unescapedTagEndDelimiter = [NSString stringWithFormat:@"}%@", self.tagEndDelimiter];
-                                
-                                tagStartDelimiterCharacter = [self.tagStartDelimiter characterAtIndex:0];
-                                tagStartDelimiterLength = self.tagStartDelimiter.length;
-                                tagEndDelimiterCharacter = [self.tagEndDelimiter characterAtIndex:0];
-                                tagEndDelimiterLength = self.tagEndDelimiter.length;
-                                
-                                unescapedTagStartDelimiterCharacter = [unescapedTagStartDelimiter characterAtIndex:0];
-                                unescapedTagStartDelimiterLength = unescapedTagStartDelimiter.length;
-                                unescapedTagEndDelimiterCharacter = [unescapedTagEndDelimiter characterAtIndex:0];
-                                unescapedTagEndDelimiterLength = unescapedTagEndDelimiter.length;
-                            } else {
-                                [self failWithParseErrorAtLine:line description:@"Invalid set delimiters tag" templateID:templateID];
-                                return;
-                            }
-
-                            break;
                         case '{':
                             type = GRMustacheTokenTypeUnescapedVariable;
                             tagInnerRange = (NSRange){ .location = start+tagStartDelimiterLength+1, .length = i-(start+tagStartDelimiterLength+1) };
@@ -481,19 +526,24 @@
                     GRMustacheToken *token = [GRMustacheToken tokenWithType:type
                                                              templateString:templateString
                                                                  templateID:templateID
-                                                                       line:line
+                                                                       line:tagStartLineNumber
                                                                       range:(NSRange){ .location = start, .length = (i+tagEndDelimiterLength)-start}];
                     token.tagInnerRange = tagInnerRange;
                     if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     
-                    start = i + currentTagEndDelimiterLength;
+                    start = i + tagEndDelimiterLength;
                     state = stateStart;
-                    i += currentTagEndDelimiterLength - 1;
+                    i += tagEndDelimiterLength - 1;
                 }
             } break;
                 
             case stateUnescapedTag: {
-                if (c == unescapedTagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, unescapedTagEndDelimiterLength)] isEqualToString:unescapedTagEndDelimiter])
+                if (c == '\n')
+                {
+                    ++lineNumber;
+                    lineStart = i + 1;
+                }
+                else if (c == unescapedTagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, unescapedTagEndDelimiterLength)] isEqualToString:unescapedTagEndDelimiter])
                 {
                     // Tag
                     // Tag do not coalesce: consume last token.
@@ -504,7 +554,7 @@
                     GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeUnescapedVariable
                                                              templateString:templateString
                                                                  templateID:templateID
-                                                                       line:line
+                                                                       line:tagStartLineNumber
                                                                       range:(NSRange){ .location = start, .length = (i+unescapedTagEndDelimiterLength)-start}];
                     token.tagInnerRange = (NSRange){ .location = start+unescapedTagStartDelimiterLength, .length = i-(start+unescapedTagStartDelimiterLength) };
                     if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
@@ -515,8 +565,72 @@
                 }
             } break;
                 
-            default:
-                break;
+            case stateSetDelimitersTag: {
+                if (c == '\n')
+                {
+                    ++lineNumber;
+                    lineStart = i + 1;
+                }
+                else if (c == setDelimitersTagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagEndDelimiterLength)] isEqualToString:setDelimitersTagEndDelimiter])
+                {
+                    // Set Delimiters Tag
+                    // Set Delimiters Tag do not coalesce: consume last token.
+                    if (lastToken) {
+                        if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
+                        lastToken = nil;
+                    }
+
+                    // extract new delimiters
+                    NSString *innerContent = [templateString substringWithRange:(NSRange){ .location = start+setDelimitersTagStartDelimiterLength, .length = i-(start+setDelimitersTagStartDelimiterLength) }];
+                    NSArray *newTags = [innerContent componentsSeparatedByCharactersInSet:whitespaceCharacterSet];
+                    NSMutableArray *nonBlankNewTags = [NSMutableArray array];
+                    for (NSString *newTag in newTags) {
+                        if (newTag.length > 0) {
+                            [nonBlankNewTags addObject:newTag];
+                        }
+                    }
+                    if (nonBlankNewTags.count != 2) {
+                        [self failWithParseErrorAtLine:lineNumber description:@"Invalid set delimiters tag" templateID:templateID];
+                        return;
+                    }
+                    
+                    GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeSetDelimiter
+                                                             templateString:templateString
+                                                                 templateID:templateID
+                                                                       line:tagStartLineNumber
+                                                                      range:(NSRange){ .location = start, .length = (i+setDelimitersTagEndDelimiterLength)-start}];
+                    token.tagInnerRange = (NSRange){ .location = start+setDelimitersTagStartDelimiterLength, .length = i-(start+setDelimitersTagStartDelimiterLength) };
+                    if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
+                    
+                    start = i + setDelimitersTagEndDelimiterLength;
+                    state = stateStart;
+                    i += setDelimitersTagEndDelimiterLength - 1;
+                    
+                    //
+                    
+                    self.tagStartDelimiter = [nonBlankNewTags objectAtIndex:0];
+                    self.tagEndDelimiter = [nonBlankNewTags objectAtIndex:1];
+                    tagStartDelimiterCharacter = [self.tagStartDelimiter characterAtIndex:0];
+                    tagStartDelimiterLength = self.tagStartDelimiter.length;
+                    tagEndDelimiterCharacter = [self.tagEndDelimiter characterAtIndex:0];
+                    tagEndDelimiterLength = self.tagEndDelimiter.length;
+                    
+                    unescapedTagStartDelimiter = [NSString stringWithFormat:@"%@{", self.tagStartDelimiter];
+                    unescapedTagEndDelimiter = [NSString stringWithFormat:@"}%@", self.tagEndDelimiter];
+                    unescapedTagStartDelimiterCharacter = [unescapedTagStartDelimiter characterAtIndex:0];
+                    unescapedTagStartDelimiterLength = unescapedTagStartDelimiter.length;
+                    unescapedTagEndDelimiterCharacter = [unescapedTagEndDelimiter characterAtIndex:0];
+                    unescapedTagEndDelimiterLength = unescapedTagEndDelimiter.length;
+                    
+                    setDelimitersTagStartDelimiter = [NSString stringWithFormat:@"%@=", self.tagStartDelimiter];
+                    setDelimitersTagEndDelimiter = [NSString stringWithFormat:@"=%@", self.tagEndDelimiter];
+                    setDelimitersTagStartDelimiterCharacter = [setDelimitersTagStartDelimiter characterAtIndex:0];
+                    setDelimitersTagStartDelimiterLength = setDelimitersTagStartDelimiter.length;
+                    setDelimitersTagEndDelimiterCharacter = [setDelimitersTagEndDelimiter characterAtIndex:0];
+                    setDelimitersTagEndDelimiterLength = setDelimitersTagEndDelimiter.length;
+                    
+                }
+            } break;
         }
     }
 
@@ -539,7 +653,7 @@
             GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankSuffix
                                                      templateString:templateString
                                                          templateID:templateID
-                                                               line:line
+                                                               line:lineNumber
                                                               range:(NSRange){ .location = start, .length = i-start}];
             if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
         } break;
@@ -555,15 +669,16 @@
                 lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
                                             templateString:templateString
                                                 templateID:templateID
-                                                      line:line
+                                                      line:lineNumber
                                                      range:(NSRange){ .location = start, .length = i-start}];
             }
             if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
         } break;
             
         case stateTag:
-        case stateUnescapedTag: {
-            [self failWithParseErrorAtLine:line description:@"Unclosed Mustache tag" templateID:templateID];
+        case stateUnescapedTag:
+        case stateSetDelimitersTag: {
+            [self failWithParseErrorAtLine:tagStartLineNumber description:@"Unclosed Mustache tag" templateID:templateID];
             return;
         } break;
             
