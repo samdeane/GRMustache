@@ -23,24 +23,57 @@
 #import "GRMustacheBuffer_private.h"
 #import "GRMustache_private.h"
 
+// =============================================================================
+#pragma mark - Private concrete class GRMustacheStringBuffer
+
+/**
+ * TODO
+ */
+@interface GRMustacheStringBuffer : GRMustacheBuffer {
+@private
+    NSMutableString *_outputString;
+}
+- (instancetype)initWithContentType:(GRMustacheContentType)contentType outputString:(NSMutableString *)outputString;
+@end
+
+// =============================================================================
+#pragma mark - Private concrete class GRMustacheBufferBuffer
+
+/**
+ * TODO
+ */
+@interface GRMustacheBufferBuffer : GRMustacheBuffer {
+@private
+    GRMustacheBuffer *_outputBuffer;
+}
+- (instancetype)initWithContentType:(GRMustacheContentType)contentType outputBuffer:(GRMustacheBuffer *)outputBuffer;
+@end
+
+// =============================================================================
+#pragma mark - Abstract class GRMustacheBuffer
+
 @interface GRMustacheBuffer()
 @property (nonatomic, readonly) GRMustacheContentType contentType;
-@property (nonatomic, retain, readonly) NSString *string;
 - (id)initWithContentType:(GRMustacheContentType)contentType;
+- (void)appendSafeString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix;
+- (NSString *)appendSafeRendering:(NSString *)string;
 @end
 
 @implementation GRMustacheBuffer
 @synthesize contentType=_contentType;
-@synthesize string=_string;
 
-+ (instancetype)bufferWithContentType:(GRMustacheContentType)contentType
++ (instancetype)bufferWithContentType:(GRMustacheContentType)contentType outputString:(NSMutableString *)outputString
 {
-    return [[[GRMustacheBuffer alloc] initWithContentType:contentType] autorelease];
+    return [[[GRMustacheStringBuffer alloc] initWithContentType:contentType outputString:outputString] autorelease];
+}
+
++ (instancetype)bufferWithContentType:(GRMustacheContentType)contentType outputBuffer:(GRMustacheBuffer *)outputBuffer
+{
+    return [[[GRMustacheBufferBuffer alloc] initWithContentType:contentType outputBuffer:outputBuffer] autorelease];
 }
 
 - (void)dealloc
 {
-    [_string release];
     [super dealloc];
 }
 
@@ -48,18 +81,9 @@
 {
     self = [super init];
     if (self) {
-        _string = [[NSMutableString alloc] init];
         _contentType = contentType;
     }
     return self;
-}
-
-- (NSString *)stringHTMLSafe:(BOOL *)HTMLSafe
-{
-    if (HTMLSafe != NULL) {
-        *HTMLSafe = (_contentType == GRMustacheContentTypeHTML);
-    }
-    return [[_string retain] autorelease];
 }
 
 - (void)appendString:(NSString *)string contentType:(GRMustacheContentType)contentType blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
@@ -68,7 +92,8 @@
     if (_contentType == GRMustacheContentTypeHTML && contentType != GRMustacheContentTypeHTML) {
         string = [GRMustache escapeHTML:string];
     }
-    [_string appendString:string];
+    
+    [self appendSafeString:string blank:blank prefix:prefix suffix:suffix];
 }
 
 - (NSString *)appendRendering:(NSString *)string contentType:(GRMustacheContentType)contentType
@@ -77,8 +102,93 @@
     if (_contentType == GRMustacheContentTypeHTML && contentType != GRMustacheContentTypeHTML) {
         string = [GRMustache escapeHTML:string];
     }
-    [_string appendString:string];
+    
+    return [self appendSafeRendering:string];
+}
+
+- (void)flush
+{
+    
+}
+
+- (void)appendSafeString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
+{
+    NSAssert(NO, @"Subclasses must override");
+}
+
+- (NSString *)appendSafeRendering:(NSString *)string
+{
+    NSAssert(NO, @"Subclasses must override");
+    return nil;
+}
+
+
+@end
+
+
+// =============================================================================
+#pragma mark - Private concrete class GRMustacheStringBuffer
+
+@implementation GRMustacheStringBuffer
+
+- (void)dealloc
+{
+    [_outputString release];
+    [super dealloc];
+}
+
+- (instancetype)initWithContentType:(GRMustacheContentType)contentType outputString:(NSMutableString *)outputString
+{
+    self = [super initWithContentType:contentType];
+    if (self) {
+        _outputString = [outputString retain];
+    }
+    return self;
+}
+
+- (void)appendSafeString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
+{
+    [_outputString appendString:string];
+}
+
+- (NSString *)appendSafeRendering:(NSString *)string
+{
+    [_outputString appendString:string];
     return string;
+}
+
+@end
+
+
+// =============================================================================
+#pragma mark - Private concrete class GRMustacheBufferBuffer
+
+@implementation GRMustacheBufferBuffer
+
+- (void)dealloc
+{
+    [_outputBuffer release];
+    [super dealloc];
+}
+
+- (instancetype)initWithContentType:(GRMustacheContentType)contentType outputBuffer:(GRMustacheBuffer *)outputBuffer
+{
+    self = [super initWithContentType:contentType];
+    if (self) {
+        _outputBuffer = [outputBuffer retain];
+    }
+    return self;
+}
+
+
+- (void)appendSafeString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
+{
+    [_outputBuffer appendString:string contentType:self.contentType blank:blank prefix:prefix suffix:suffix];
+}
+
+- (NSString *)appendSafeRendering:(NSString *)string
+{
+    return [_outputBuffer appendRendering:string contentType:self.contentType];
 }
 
 @end

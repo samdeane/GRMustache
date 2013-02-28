@@ -68,7 +68,8 @@
         return NO;
     }
     
-    GRMustacheBuffer *buffer = [GRMustacheBuffer bufferWithContentType:self.contentType];
+    NSMutableString *rendering = [NSMutableString string];
+    GRMustacheBuffer *buffer = [GRMustacheBuffer bufferWithContentType:self.contentType outputString:rendering];
     
     for (id<GRMustacheTemplateComponent> component in _components) {
         // component may be overriden by a GRMustacheTemplateOverride: resolve it.
@@ -80,7 +81,11 @@
         }
     }
     
-    return [buffer stringHTMLSafe:HTMLSafe];
+    if (HTMLSafe != NULL) {
+        *HTMLSafe = (self.contentType == GRMustacheContentTypeHTML);
+    }
+    [buffer flush];
+    return rendering;
 }
 
 - (NSString *)innerTemplateString

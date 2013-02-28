@@ -101,11 +101,16 @@
 
 - (NSString *)renderContentWithContext:(GRMustacheContext *)context HTMLSafe:(BOOL *)HTMLSafe error:(NSError **)error
 {
-    GRMustacheBuffer *buffer = [GRMustacheBuffer bufferWithContentType:_contentType];
+    NSMutableString *rendering = [NSMutableString string];
+    GRMustacheBuffer *buffer = [GRMustacheBuffer bufferWithContentType:self.contentType outputString:rendering];
     if (![self renderContentType:_contentType inBuffer:buffer withContext:context error:error]) {
         return nil;
     }
-    return [buffer stringHTMLSafe:HTMLSafe];
+    if (HTMLSafe != NULL) {
+        *HTMLSafe = (self.contentType == GRMustacheContentTypeHTML);
+    }
+    [buffer flush];
+    return rendering;
 }
 
 - (void)setBaseContext:(GRMustacheContext *)baseContext
@@ -133,7 +138,7 @@
         return NO;
     }
     
-    GRMustacheBuffer *localBuffer = [GRMustacheBuffer bufferWithContentType:_contentType];;
+    GRMustacheBuffer *localBuffer = [GRMustacheBuffer bufferWithContentType:_contentType outputBuffer:buffer];
     
     for (id<GRMustacheTemplateComponent> component in _components) {
         // component may be overriden by a GRMustacheTemplateOverride: resolve it.
@@ -145,7 +150,7 @@
         }
     }
     
-    [buffer appendRendering:[localBuffer stringHTMLSafe:NULL] contentType:_contentType];
+    [localBuffer flush];
     
     return YES;
 }

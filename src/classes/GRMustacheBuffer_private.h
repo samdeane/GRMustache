@@ -30,18 +30,17 @@
 @interface GRMustacheBuffer : NSObject {
 @private
     GRMustacheContentType _contentType;
-    NSMutableString *_string;
 }
 
 /**
  * TODO
  */
-+ (instancetype)bufferWithContentType:(GRMustacheContentType)contentType GRMUSTACHE_API_INTERNAL;
++ (instancetype)bufferWithContentType:(GRMustacheContentType)contentType outputString:(NSMutableString *)outputString GRMUSTACHE_API_INTERNAL;
 
 /**
  * TODO
  */
-- (NSString *)stringHTMLSafe:(BOOL *)HTMLSafe GRMUSTACHE_API_INTERNAL;
++ (instancetype)bufferWithContentType:(GRMustacheContentType)contentType outputBuffer:(GRMustacheBuffer *)outputBuffer GRMUSTACHE_API_INTERNAL;
 
 /**
  * TODO
@@ -53,4 +52,8 @@
  */
 - (NSString *)appendRendering:(NSString *)string contentType:(GRMustacheContentType)contentType GRMUSTACHE_API_INTERNAL;
 
+/**
+ * TODO
+ */
+- (void)flush GRMUSTACHE_API_INTERNAL;
 @end
