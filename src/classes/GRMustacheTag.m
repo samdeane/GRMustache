@@ -111,8 +111,6 @@
 
 - (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(GRMustacheBuffer *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error
 {
-    NSAssert(requiredContentType == self.contentType, @"Not implemented");
-    
     BOOL success = YES;
     
     @autoreleasepool {
@@ -220,17 +218,15 @@
                 
                 // Success
                 
-                if (rendering.length > 0) {
-                    if ((requiredContentType == GRMustacheContentTypeHTML) && !objectHTMLSafe && self.escapesHTML) {
-                        rendering = [GRMustache escapeHTML:rendering];
-                    }
+                GRMustacheContentType renderingContentType = objectHTMLSafe ? GRMustacheContentTypeHTML : GRMustacheContentTypeText;
+                if (_contentType == GRMustacheContentTypeHTML && !self.escapesHTML) {
+                    // promote
+                    renderingContentType = GRMustacheContentTypeHTML;
                 }
-                
-                [buffer appendRendering:rendering];
+                rendering = [buffer appendRendering:rendering contentType:renderingContentType];
                 
                 // Tag delegates post-rendering callbacks
                 
-                if (rendering == nil) { rendering = @""; }  // Don't expose nil as a success
                 [context enumerateTagDelegatesUsingBlock:^(id<GRMustacheTagDelegate> tagDelegate) {
                     if ([tagDelegate respondsToSelector:@selector(mustacheTag:didRenderObject:as:)]) {
                         [tagDelegate mustacheTag:self didRenderObject:object as:rendering];

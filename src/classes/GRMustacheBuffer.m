@@ -21,12 +21,21 @@
 // THE SOFTWARE.
 
 #import "GRMustacheBuffer_private.h"
+#import "GRMustache_private.h"
+
+@interface GRMustacheBuffer()
+@property (nonatomic, readonly) GRMustacheContentType contentType;
+@property (nonatomic, retain, readonly) NSString *string;
+- (id)initWithContentType:(GRMustacheContentType)contentType;
+@end
 
 @implementation GRMustacheBuffer
+@synthesize contentType=_contentType;
+@synthesize string=_string;
 
-+ (instancetype)buffer
++ (instancetype)bufferWithContentType:(GRMustacheContentType)contentType
 {
-    return [[[GRMustacheBuffer alloc] init] autorelease];
+    return [[[GRMustacheBuffer alloc] initWithContentType:contentType] autorelease];
 }
 
 - (void)dealloc
@@ -35,30 +44,41 @@
     [super dealloc];
 }
 
-- (id)init
+- (id)initWithContentType:(GRMustacheContentType)contentType
 {
     self = [super init];
     if (self) {
         _string = [[NSMutableString alloc] init];
+        _contentType = contentType;
     }
     return self;
 }
 
-- (NSString *)string
+- (NSString *)stringHTMLSafe:(BOOL *)HTMLSafe
 {
+    if (HTMLSafe != NULL) {
+        *HTMLSafe = (_contentType == GRMustacheContentTypeHTML);
+    }
     return [[_string retain] autorelease];
 }
 
-- (void)appendString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
+- (void)appendString:(NSString *)string contentType:(GRMustacheContentType)contentType blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
 {
     if (string == nil) return;
+    if (_contentType == GRMustacheContentTypeHTML && contentType != GRMustacheContentTypeHTML) {
+        string = [GRMustache escapeHTML:string];
+    }
     [_string appendString:string];
 }
 
-- (void)appendRendering:(NSString *)string
+- (NSString *)appendRendering:(NSString *)string contentType:(GRMustacheContentType)contentType
 {
-    if (string == nil) return;
+    if (string == nil) return @"";
+    if (_contentType == GRMustacheContentTypeHTML && contentType != GRMustacheContentTypeHTML) {
+        string = [GRMustache escapeHTML:string];
+    }
     [_string appendString:string];
+    return string;
 }
 
 @end

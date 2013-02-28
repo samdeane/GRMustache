@@ -20,36 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
-#import <objc/message.h>
 #import <Foundation/Foundation.h>
 #import "GRMustacheAvailabilityMacros_private.h"
+#import "GRMustacheConfiguration_private.h"
 
 /**
  * TODO
  */
 @interface GRMustacheBuffer : NSObject {
 @private
+    GRMustacheContentType _contentType;
     NSMutableString *_string;
 }
 
 /**
  * TODO
  */
-+ (instancetype)buffer GRMUSTACHE_API_INTERNAL;
++ (instancetype)bufferWithContentType:(GRMustacheContentType)contentType GRMUSTACHE_API_INTERNAL;
 
 /**
  * TODO
  */
-- (NSString *)string GRMUSTACHE_API_INTERNAL;
+- (NSString *)stringHTMLSafe:(BOOL *)HTMLSafe GRMUSTACHE_API_INTERNAL;
 
 /**
  * TODO
  */
-- (void)appendString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix GRMUSTACHE_API_INTERNAL;
+- (void)appendString:(NSString *)string contentType:(GRMustacheContentType)contentType blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix GRMUSTACHE_API_INTERNAL;
 
 /**
  * TODO
  */
-- (void)appendRendering:(NSString *)string GRMUSTACHE_API_INTERNAL;
+- (NSString *)appendRendering:(NSString *)string contentType:(GRMustacheContentType)contentType GRMUSTACHE_API_INTERNAL;
 
 @end

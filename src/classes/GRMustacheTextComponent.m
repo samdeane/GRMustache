@@ -48,7 +48,7 @@
 
 - (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(GRMustacheBuffer *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error
 {
-    [buffer appendString:_string blank:_blank prefix:_prefix suffix:_suffix];
+    [buffer appendString:_string contentType:requiredContentType blank:_blank prefix:_prefix suffix:_suffix];
     return YES;
 }
 
