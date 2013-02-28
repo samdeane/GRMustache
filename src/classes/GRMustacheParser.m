@@ -126,7 +126,6 @@
     NSUInteger setDelimitersTagEndDelimiterLength = setDelimitersTagEndDelimiter.length;
     
     NSCharacterSet *whitespaceCharacterSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-    GRMustacheToken *lastToken = nil;
     NSUInteger start = 0;
     NSUInteger lineStart = 0;
     NSUInteger i = 0;
@@ -145,11 +144,6 @@
                 {
                     if (lineStart == start) {
                         // Blank line
-                        // Blank lines do not coalesce: consume last token.
-                        if (lastToken) {
-                            if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                            lastToken = nil;
-                        }
                         GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankLine
                                                                  templateString:templateString
                                                                      templateID:templateID
@@ -158,11 +152,6 @@
                         if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     } else {
                         // Blank end of line
-                        // Blank end of line do not coalesce: consume last token.
-                        if (lastToken) {
-                            if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                            lastToken = nil;
-                        }
                         GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankEndOfLine
                                                                  templateString:templateString
                                                                      templateID:templateID
@@ -210,11 +199,6 @@
                 {
                     if (lineStart == start) {
                         // Blank line
-                        // Blank lines do not coalesce: consume last token.
-                        if (lastToken) {
-                            if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                            lastToken = nil;
-                        }
                         GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankLine
                                                                  templateString:templateString
                                                                      templateID:templateID
@@ -223,11 +207,6 @@
                         if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     } else {
                         // Blank end of line
-                        // Blank end of line do not coalesce: consume last token.
-                        if (lastToken) {
-                            if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                            lastToken = nil;
-                        }
                         GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankEndOfLine
                                                                  templateString:templateString
                                                                      templateID:templateID
@@ -244,11 +223,6 @@
                     if (start != i) {
                         if (lineStart == start) {
                             // Blank prefix
-                            // Blank prefix do not coalesce: consume last token.
-                            if (lastToken) {
-                                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                                lastToken = nil;
-                            }
                             GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankPrefix
                                                                      templateString:templateString
                                                                          templateID:templateID
@@ -257,20 +231,12 @@
                             if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                         } else {
                             // Content
-                            // Content coalesce
-                            if (lastToken) {
-                                if (lastToken.type == GRMustacheTokenTypeContent) {
-                                    lastToken.range = (NSRange){ .location = lastToken.range.location, .length = i-lastToken.range.location };
-                                } else {
-                                    if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                                }
-                            } else {
-                                lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                            templateString:templateString
-                                                                templateID:templateID
-                                                                      line:lineNumber
-                                                                     range:(NSRange){ .location = start, .length = i-start}];
-                            }
+                            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                                     templateString:templateString
+                                                                         templateID:templateID
+                                                                               line:lineNumber
+                                                                              range:(NSRange){ .location = start, .length = i-start}];
+                            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                         }
                     }
                     tagStartLineNumber = lineNumber;
@@ -283,11 +249,6 @@
                     if (start != i) {
                         if (lineStart == start) {
                             // Blank prefix
-                            // Blank prefix do not coalesce: consume last token.
-                            if (lastToken) {
-                                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                                lastToken = nil;
-                            }
                             GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankPrefix
                                                                      templateString:templateString
                                                                          templateID:templateID
@@ -296,20 +257,12 @@
                             if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                         } else {
                             // Content
-                            // Content coalesce
-                            if (lastToken) {
-                                if (lastToken.type == GRMustacheTokenTypeContent) {
-                                    lastToken.range = (NSRange){ .location = lastToken.range.location, .length = i-lastToken.range.location };
-                                } else {
-                                    if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                                }
-                            } else {
-                                lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                            templateString:templateString
-                                                                templateID:templateID
-                                                                      line:lineNumber
-                                                                     range:(NSRange){ .location = start, .length = i-start}];
-                            }
+                            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                                     templateString:templateString
+                                                                         templateID:templateID
+                                                                               line:lineNumber
+                                                                              range:(NSRange){ .location = start, .length = i-start}];
+                            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                         }
                     }
                     tagStartLineNumber = lineNumber;
@@ -322,11 +275,6 @@
                     if (start != i) {
                         if (lineStart == start) {
                             // Blank prefix
-                            // Blank prefix do not coalesce: consume last token.
-                            if (lastToken) {
-                                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                                lastToken = nil;
-                            }
                             GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankPrefix
                                                                      templateString:templateString
                                                                          templateID:templateID
@@ -335,20 +283,12 @@
                             if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                         } else {
                             // Content
-                            // Content coalesce
-                            if (lastToken) {
-                                if (lastToken.type == GRMustacheTokenTypeContent) {
-                                    lastToken.range = (NSRange){ .location = lastToken.range.location, .length = i-lastToken.range.location };
-                                } else {
-                                    if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                                }
-                            } else {
-                                lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                            templateString:templateString
-                                                                templateID:templateID
-                                                                      line:lineNumber
-                                                                     range:(NSRange){ .location = start, .length = i-start}];
-                            }
+                            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                                     templateString:templateString
+                                                                         templateID:templateID
+                                                                               line:lineNumber
+                                                                              range:(NSRange){ .location = start, .length = i-start}];
+                            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                         }
                     }
                     tagStartLineNumber = lineNumber;
@@ -367,20 +307,12 @@
                 {
                     if (start != (i+1)) {
                         // Content
-                        // Content coalesce
-                        if (lastToken) {
-                            if (lastToken.type == GRMustacheTokenTypeContent) {
-                                lastToken.range = (NSRange){ .location = lastToken.range.location, .length = (i+1)-lastToken.range.location };
-                            } else {
-                                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                            }
-                        } else {
-                            lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                        templateString:templateString
-                                                            templateID:templateID
-                                                                  line:lineNumber
-                                                                 range:(NSRange){ .location = start, .length = (i+1)-start}];
-                        }
+                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                                 templateString:templateString
+                                                                     templateID:templateID
+                                                                           line:lineNumber
+                                                                          range:(NSRange){ .location = start, .length = (i+1)-start}];
+                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     }
                     ++lineNumber;
                     lineStart = start = i + 1;
@@ -390,20 +322,12 @@
                 {
                     if (start != i) {
                         // Content
-                        // Content coalesce
-                        if (lastToken) {
-                            if (lastToken.type == GRMustacheTokenTypeContent) {
-                                lastToken.range = (NSRange){ .location = lastToken.range.location, .length = i-lastToken.range.location };
-                            } else {
-                                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                            }
-                        } else {
-                            lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                        templateString:templateString
-                                                            templateID:templateID
-                                                                  line:lineNumber
-                                                                 range:(NSRange){ .location = start, .length = i-start}];
-                        }
+                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                                 templateString:templateString
+                                                                     templateID:templateID
+                                                                           line:lineNumber
+                                                                          range:(NSRange){ .location = start, .length = i-start}];
+                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     }
                     tagStartLineNumber = lineNumber;
                     start = i;
@@ -414,20 +338,12 @@
                 {
                     if (start != i) {
                         // Content
-                        // Content coalesce
-                        if (lastToken) {
-                            if (lastToken.type == GRMustacheTokenTypeContent) {
-                                lastToken.range = (NSRange){ .location = lastToken.range.location, .length = i-lastToken.range.location };
-                            } else {
-                                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                            }
-                        } else {
-                            lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                        templateString:templateString
-                                                            templateID:templateID
-                                                                  line:lineNumber
-                                                                 range:(NSRange){ .location = start, .length = i-start}];
-                        }
+                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                                 templateString:templateString
+                                                                     templateID:templateID
+                                                                           line:lineNumber
+                                                                          range:(NSRange){ .location = start, .length = i-start}];
+                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     }
                     tagStartLineNumber = lineNumber;
                     start = i;
@@ -438,20 +354,12 @@
                 {
                     if (start != i) {
                         // Content
-                        // Content coalesce
-                        if (lastToken) {
-                            if (lastToken.type == GRMustacheTokenTypeContent) {
-                                lastToken.range = (NSRange){ .location = lastToken.range.location, .length = i-lastToken.range.location };
-                            } else {
-                                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                            }
-                        } else {
-                            lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                        templateString:templateString
-                                                            templateID:templateID
-                                                                  line:lineNumber
-                                                                 range:(NSRange){ .location = start, .length = i-start}];
-                        }
+                        GRMustacheToken *token =  [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                                  templateString:templateString
+                                                                      templateID:templateID
+                                                                            line:lineNumber
+                                                                           range:(NSRange){ .location = start, .length = i-start}];
+                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     }
                     tagStartLineNumber = lineNumber;
                     start = i;
@@ -469,11 +377,6 @@
                 else if (c == tagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, tagEndDelimiterLength)] isEqualToString:self.tagEndDelimiter])
                 {
                     // Tag
-                    // Tag do not coalesce: consume last token.
-                    if (lastToken) {
-                        if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                        lastToken = nil;
-                    }
                     GRMustacheTokenType type = GRMustacheTokenTypeEscapedVariable;
                     UniChar tagInitial = characters[start+tagStartDelimiterLength];
                     NSRange tagInnerRange;
@@ -546,11 +449,6 @@
                 else if (c == unescapedTagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, unescapedTagEndDelimiterLength)] isEqualToString:unescapedTagEndDelimiter])
                 {
                     // Tag
-                    // Tag do not coalesce: consume last token.
-                    if (lastToken) {
-                        if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                        lastToken = nil;
-                    }
                     GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeUnescapedVariable
                                                              templateString:templateString
                                                                  templateID:templateID
@@ -574,13 +472,6 @@
                 else if (c == setDelimitersTagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagEndDelimiterLength)] isEqualToString:setDelimitersTagEndDelimiter])
                 {
                     // Set Delimiters Tag
-                    // Set Delimiters Tag do not coalesce: consume last token.
-                    if (lastToken) {
-                        if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                        lastToken = nil;
-                    }
-
-                    // extract new delimiters
                     NSString *innerContent = [templateString substringWithRange:(NSRange){ .location = start+setDelimitersTagStartDelimiterLength, .length = i-(start+setDelimitersTagStartDelimiterLength) }];
                     NSArray *newTags = [innerContent componentsSeparatedByCharactersInSet:whitespaceCharacterSet];
                     NSMutableArray *nonBlankNewTags = [NSMutableArray array];
@@ -637,19 +528,10 @@
     // EOF
     switch (state) {
         case stateStart:
-            if (lastToken) {
-                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                lastToken = nil;
-            }
             break;
             
         case stateSpaceRun: {
             // Blank suffix
-            // Blank suffix do not coalesce: consume last token.
-            if (lastToken) {
-                if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
-                lastToken = nil;
-            }
             GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankSuffix
                                                      templateString:templateString
                                                          templateID:templateID
@@ -660,19 +542,12 @@
             
         case stateContent: {
             // Content
-            // Content coalesce
-            if (lastToken) {
-                if (lastToken.type == GRMustacheTokenTypeContent) {
-                    lastToken.range = (NSRange){ .location = lastToken.range.location, .length = i-lastToken.range.location };
-                }
-            } else {
-                lastToken = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                            templateString:templateString
-                                                templateID:templateID
-                                                      line:lineNumber
-                                                     range:(NSRange){ .location = start, .length = i-start}];
-            }
-            if (![self.delegate parser:self shouldContinueAfterParsingToken:lastToken]) return;
+            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                     templateString:templateString
+                                                         templateID:templateID
+                                                               line:lineNumber
+                                                              range:(NSRange){ .location = start, .length = i-start}];
+            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
         } break;
             
         case stateTag:
