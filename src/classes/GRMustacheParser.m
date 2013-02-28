@@ -96,41 +96,58 @@
         characters = [data bytes];
     }
     
+    NSCharacterSet *whitespaceCharacterSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+    
     // state machine internal states
     enum {
-        stateStart,
-        stateSpaceRun,
-        stateContent,
-        stateTag,
-        stateUnescapedTag,
-        stateSetDelimitersTag,
+        stateStart,             // Something is going to happen. We don't know what yet. Next character will tell.
+        stateSpaceRun,          // Currently enumerating white space characters
+        stateContent,           // Currently enumerating other characters
+        stateTag,               // Currently enumerating characters of a {{tag}}
+        stateUnescapedTag,      // Currently enumerating characters of a {{{tag}}}
+        stateSetDelimitersTag,  // Currently enumerating characters of a {{=tag=}}
     } state = stateStart;
     
-    UniChar tagStartDelimiterCharacter = [self.tagStartDelimiter characterAtIndex:0];
+    // Some cached value for "efficient" lookup of {{ and }}
+    UniChar tagStartDelimiterInitial = [self.tagStartDelimiter characterAtIndex:0];
     NSUInteger tagStartDelimiterLength = self.tagStartDelimiter.length;
-    UniChar tagEndDelimiterCharacter = [self.tagEndDelimiter characterAtIndex:0];
+    UniChar tagEndDelimiterInitial = [self.tagEndDelimiter characterAtIndex:0];
     NSUInteger tagEndDelimiterLength = self.tagEndDelimiter.length;
     
-    NSString *unescapedTagStartDelimiter = [NSString stringWithFormat:@"%@{", self.tagStartDelimiter];
-    NSString *unescapedTagEndDelimiter = [NSString stringWithFormat:@"}%@", self.tagEndDelimiter];
-    UniChar unescapedTagStartDelimiterCharacter = [unescapedTagStartDelimiter characterAtIndex:0];
+    // Some cached value for "efficient" lookup of {{{ and }}}
+    //
+    // Mustache spec does not say that what happens to triple mustache tags when
+    // delimiters are not {{ and }}. It just says to use the & tag prefix:
+    // {{{ a }}} <=> {{& a }}.
+    //
+    // We interpret this as a complete removal of triple mustache tags when
+    // delimiters are not {{ and }}: unescapedTagStartDelimiterInitial will be 0
+    // and we will never enter the stateUnescapedTag state.
+    BOOL standardDelimiters = [self.tagStartDelimiter isEqualToString:@"{{"] && [self.tagEndDelimiter isEqualToString:@"}}"];
+    NSString *unescapedTagStartDelimiter = standardDelimiters ? @"{{{" : nil;
+    NSString *unescapedTagEndDelimiter = standardDelimiters ? @"}}}" : nil;
+    UniChar unescapedTagStartDelimiterInitial = [unescapedTagStartDelimiter characterAtIndex:0];
     NSUInteger unescapedTagStartDelimiterLength = unescapedTagStartDelimiter.length;
-    UniChar unescapedTagEndDelimiterCharacter = [unescapedTagEndDelimiter characterAtIndex:0];
+    UniChar unescapedTagEndDelimiterInitial = [unescapedTagEndDelimiter characterAtIndex:0];
     NSUInteger unescapedTagEndDelimiterLength = unescapedTagEndDelimiter.length;
     
+    // Some cached value for "efficient" lookup of {{= and =}}
+    //
+    // Set delimiters tags {{=<% %>=}} have a dedicated lookup and state, so that
+    // we support setting to the current delimiters: {{={{ }}=}}. We achieve this
+    // by exiting the stateSetDelimitersTag state on =}}, not on }}.
     NSString *setDelimitersTagStartDelimiter = [NSString stringWithFormat:@"%@=", self.tagStartDelimiter];
     NSString *setDelimitersTagEndDelimiter = [NSString stringWithFormat:@"=%@", self.tagEndDelimiter];
-    UniChar setDelimitersTagStartDelimiterCharacter = [setDelimitersTagStartDelimiter characterAtIndex:0];
+    UniChar setDelimitersTagStartDelimiterInitial = [setDelimitersTagStartDelimiter characterAtIndex:0];
     NSUInteger setDelimitersTagStartDelimiterLength = setDelimitersTagStartDelimiter.length;
-    UniChar setDelimitersTagEndDelimiterCharacter = [setDelimitersTagEndDelimiter characterAtIndex:0];
+    UniChar setDelimitersTagEndDelimiterInitial = [setDelimitersTagEndDelimiter characterAtIndex:0];
     NSUInteger setDelimitersTagEndDelimiterLength = setDelimitersTagEndDelimiter.length;
     
-    NSCharacterSet *whitespaceCharacterSet = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-    NSUInteger start = 0;
-    NSUInteger lineStart = 0;
-    NSUInteger i = 0;
-    NSUInteger lineNumber = 1;
-    NSUInteger tagStartLineNumber = 1;
+    NSUInteger i = 0;                   // index of current character
+    NSUInteger start = 0;               // index of character at the beginning of the current state
+    NSUInteger lineStart = 0;           // index of first character of the current line
+    NSUInteger lineNumber = 1;          // 1-based index of the current line
+    NSUInteger tagStartLineNumber = 1;  // 1-based index of the beginning of the current tag
     for (; i<length; ++i) {
         UniChar c = characters[i];
         switch (state) {
@@ -163,21 +180,21 @@
                     lineStart = start = i + 1;
                     state = stateStart;
                 }
-                else if (c == unescapedTagStartDelimiterCharacter && (i+unescapedTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, unescapedTagStartDelimiterLength)] isEqualToString:unescapedTagStartDelimiter])
+                else if (c == unescapedTagStartDelimiterInitial && (i+unescapedTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, unescapedTagStartDelimiterLength)] isEqualToString:unescapedTagStartDelimiter])
                 {
                     tagStartLineNumber = lineNumber;
                     start = i;
                     state = stateUnescapedTag;
                     i += unescapedTagStartDelimiterLength - 1;
                 }
-                else if (c == setDelimitersTagStartDelimiterCharacter && (i+setDelimitersTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagStartDelimiterLength)] isEqualToString:setDelimitersTagStartDelimiter])
+                else if (c == setDelimitersTagStartDelimiterInitial && (i+setDelimitersTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagStartDelimiterLength)] isEqualToString:setDelimitersTagStartDelimiter])
                 {
                     tagStartLineNumber = lineNumber;
                     start = i;
                     state = stateSetDelimitersTag;
                     i += setDelimitersTagStartDelimiterLength - 1;
                 }
-                else if (c == tagStartDelimiterCharacter && (i+tagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, tagStartDelimiterLength)] isEqualToString:self.tagStartDelimiter])
+                else if (c == tagStartDelimiterInitial && (i+tagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, tagStartDelimiterLength)] isEqualToString:self.tagStartDelimiter])
                 {
                     tagStartLineNumber = lineNumber;
                     start = i;
@@ -218,7 +235,7 @@
                     lineStart = start = i + 1;
                     state = stateStart;
                 }
-                else if (c == unescapedTagStartDelimiterCharacter && (i+unescapedTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, unescapedTagStartDelimiterLength)] isEqualToString:unescapedTagStartDelimiter])
+                else if (c == unescapedTagStartDelimiterInitial && (i+unescapedTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, unescapedTagStartDelimiterLength)] isEqualToString:unescapedTagStartDelimiter])
                 {
                     if (start != i) {
                         if (lineStart == start) {
@@ -244,7 +261,7 @@
                     state = stateUnescapedTag;
                     i += unescapedTagStartDelimiterLength - 1;
                 }
-                else if (c == setDelimitersTagStartDelimiterCharacter && (i+setDelimitersTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagStartDelimiterLength)] isEqualToString:setDelimitersTagStartDelimiter])
+                else if (c == setDelimitersTagStartDelimiterInitial && (i+setDelimitersTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagStartDelimiterLength)] isEqualToString:setDelimitersTagStartDelimiter])
                 {
                     if (start != i) {
                         if (lineStart == start) {
@@ -270,7 +287,7 @@
                     state = stateSetDelimitersTag;
                     i += setDelimitersTagStartDelimiterLength - 1;
                 }
-                else if (c == tagStartDelimiterCharacter && (i+tagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, tagStartDelimiterLength)] isEqualToString:self.tagStartDelimiter])
+                else if (c == tagStartDelimiterInitial && (i+tagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, tagStartDelimiterLength)] isEqualToString:self.tagStartDelimiter])
                 {
                     if (start != i) {
                         if (lineStart == start) {
@@ -318,7 +335,7 @@
                     lineStart = start = i + 1;
                     state = stateStart;
                 }
-                else if (c == unescapedTagStartDelimiterCharacter && (i+unescapedTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, unescapedTagStartDelimiterLength)] isEqualToString:unescapedTagStartDelimiter])
+                else if (c == unescapedTagStartDelimiterInitial && (i+unescapedTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, unescapedTagStartDelimiterLength)] isEqualToString:unescapedTagStartDelimiter])
                 {
                     if (start != i) {
                         // Content
@@ -334,7 +351,7 @@
                     state = stateUnescapedTag;
                     i += unescapedTagStartDelimiterLength - 1;
                 }
-                else if (c == setDelimitersTagStartDelimiterCharacter && (i+setDelimitersTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagStartDelimiterLength)] isEqualToString:setDelimitersTagStartDelimiter])
+                else if (c == setDelimitersTagStartDelimiterInitial && (i+setDelimitersTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagStartDelimiterLength)] isEqualToString:setDelimitersTagStartDelimiter])
                 {
                     if (start != i) {
                         // Content
@@ -350,7 +367,7 @@
                     state = stateSetDelimitersTag;
                     i += setDelimitersTagStartDelimiterLength - 1;
                 }
-                else if (c == tagStartDelimiterCharacter && (i+tagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, tagStartDelimiterLength)] isEqualToString:self.tagStartDelimiter])
+                else if (c == tagStartDelimiterInitial && (i+tagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, tagStartDelimiterLength)] isEqualToString:self.tagStartDelimiter])
                 {
                     if (start != i) {
                         // Content
@@ -374,7 +391,7 @@
                     ++lineNumber;
                     lineStart = i + 1;
                 }
-                else if (c == tagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, tagEndDelimiterLength)] isEqualToString:self.tagEndDelimiter])
+                else if (c == tagEndDelimiterInitial && [[templateString substringWithRange:NSMakeRange(i, tagEndDelimiterLength)] isEqualToString:self.tagEndDelimiter])
                 {
                     // Tag
                     GRMustacheTokenType type = GRMustacheTokenTypeEscapedVariable;
@@ -446,7 +463,7 @@
                     ++lineNumber;
                     lineStart = i + 1;
                 }
-                else if (c == unescapedTagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, unescapedTagEndDelimiterLength)] isEqualToString:unescapedTagEndDelimiter])
+                else if (c == unescapedTagEndDelimiterInitial && [[templateString substringWithRange:NSMakeRange(i, unescapedTagEndDelimiterLength)] isEqualToString:unescapedTagEndDelimiter])
                 {
                     // Tag
                     GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeUnescapedVariable
@@ -469,7 +486,7 @@
                     ++lineNumber;
                     lineStart = i + 1;
                 }
-                else if (c == setDelimitersTagEndDelimiterCharacter && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagEndDelimiterLength)] isEqualToString:setDelimitersTagEndDelimiter])
+                else if (c == setDelimitersTagEndDelimiterInitial && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagEndDelimiterLength)] isEqualToString:setDelimitersTagEndDelimiter])
                 {
                     // Set Delimiters Tag
                     NSString *innerContent = [templateString substringWithRange:(NSRange){ .location = start+setDelimitersTagStartDelimiterLength, .length = i-(start+setDelimitersTagStartDelimiterLength) }];
@@ -497,27 +514,29 @@
                     state = stateStart;
                     i += setDelimitersTagEndDelimiterLength - 1;
                     
-                    //
+                    // Update tag delimiters, and cached values for "efficient"
+                    // lookup of them (see character loop initialization)
                     
                     self.tagStartDelimiter = [nonBlankNewTags objectAtIndex:0];
                     self.tagEndDelimiter = [nonBlankNewTags objectAtIndex:1];
-                    tagStartDelimiterCharacter = [self.tagStartDelimiter characterAtIndex:0];
+                    tagStartDelimiterInitial = [self.tagStartDelimiter characterAtIndex:0];
                     tagStartDelimiterLength = self.tagStartDelimiter.length;
-                    tagEndDelimiterCharacter = [self.tagEndDelimiter characterAtIndex:0];
+                    tagEndDelimiterInitial = [self.tagEndDelimiter characterAtIndex:0];
                     tagEndDelimiterLength = self.tagEndDelimiter.length;
                     
-                    unescapedTagStartDelimiter = [NSString stringWithFormat:@"%@{", self.tagStartDelimiter];
-                    unescapedTagEndDelimiter = [NSString stringWithFormat:@"}%@", self.tagEndDelimiter];
-                    unescapedTagStartDelimiterCharacter = [unescapedTagStartDelimiter characterAtIndex:0];
+                    BOOL standardDelimiters = [self.tagStartDelimiter isEqualToString:@"{{"] && [self.tagEndDelimiter isEqualToString:@"}}"];
+                    unescapedTagStartDelimiter = standardDelimiters ? @"{{{" : nil;
+                    unescapedTagEndDelimiter = standardDelimiters ? @"}}}" : nil;
+                    unescapedTagStartDelimiterInitial = [unescapedTagStartDelimiter characterAtIndex:0];
                     unescapedTagStartDelimiterLength = unescapedTagStartDelimiter.length;
-                    unescapedTagEndDelimiterCharacter = [unescapedTagEndDelimiter characterAtIndex:0];
+                    unescapedTagEndDelimiterInitial = [unescapedTagEndDelimiter characterAtIndex:0];
                     unescapedTagEndDelimiterLength = unescapedTagEndDelimiter.length;
                     
                     setDelimitersTagStartDelimiter = [NSString stringWithFormat:@"%@=", self.tagStartDelimiter];
                     setDelimitersTagEndDelimiter = [NSString stringWithFormat:@"=%@", self.tagEndDelimiter];
-                    setDelimitersTagStartDelimiterCharacter = [setDelimitersTagStartDelimiter characterAtIndex:0];
+                    setDelimitersTagStartDelimiterInitial = [setDelimitersTagStartDelimiter characterAtIndex:0];
                     setDelimitersTagStartDelimiterLength = setDelimitersTagStartDelimiter.length;
-                    setDelimitersTagEndDelimiterCharacter = [setDelimitersTagEndDelimiter characterAtIndex:0];
+                    setDelimitersTagEndDelimiterInitial = [setDelimitersTagEndDelimiter characterAtIndex:0];
                     setDelimitersTagEndDelimiterLength = setDelimitersTagEndDelimiter.length;
                     
                 }
