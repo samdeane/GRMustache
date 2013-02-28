@@ -27,8 +27,9 @@
 #import "GRMustacheAccumulatorTag_private.h"
 #import "GRMustacheTagDelegate.h"
 #import "GRMustacheContext_private.h"
-#import "GRMustacheRendering.h"
+#import "GRMustacheBuffer_private.h"
 #import "GRMustache_private.h"
+#import "GRMustacheRendering.h"
 
 @interface GRMustacheSectionTag()
 
@@ -67,7 +68,7 @@
         return NO;
     }
     
-    NSMutableString *buffer = [NSMutableString string];
+    GRMustacheBuffer *buffer = [GRMustacheBuffer buffer];
     
     for (id<GRMustacheTemplateComponent> component in _components) {
         // component may be overriden by a GRMustacheTemplateOverride: resolve it.
@@ -82,7 +83,7 @@
     if (HTMLSafe) {
         *HTMLSafe = (self.contentType == GRMustacheContentTypeHTML);
     }
-    return buffer;
+    return [buffer string];
 }
 
 - (NSString *)innerTemplateString

@@ -235,15 +235,44 @@
         } break;
             
         case GRMustacheTokenTypeContent:
+            // Parser validation
+            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
+            
+            // Success: append GRMustacheTextComponent
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring blank:NO prefix:NO suffix:NO]];
+            break;
+            
+            
         case GRMustacheTokenTypeBlankLine:
+            // Parser validation
+            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
+            
+            // Success: append GRMustacheTextComponent
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring blank:YES prefix:YES suffix:YES]];
+            break;
+            
         case GRMustacheTokenTypeBlankEndOfLine:
+            // Parser validation
+            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
+            
+            // Success: append GRMustacheTextComponent
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring blank:YES prefix:NO suffix:YES]];
+            break;
+            
         case GRMustacheTokenTypeBlankPrefix:
+            // Parser validation
+            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
+            
+            // Success: append GRMustacheTextComponent
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring blank:YES prefix:YES suffix:NO]];
+            break;
+            
         case GRMustacheTokenTypeBlankSuffix:
             // Parser validation
             NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
             
             // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring]];
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring blank:YES prefix:NO suffix:NO]];
             break;
             
             

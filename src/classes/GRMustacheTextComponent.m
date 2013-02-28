@@ -21,33 +21,34 @@
 // THE SOFTWARE.
 
 #import "GRMustacheTextComponent_private.h"
+#import "GRMustacheBuffer_private.h"
 
 
 @interface GRMustacheTextComponent()
-@property (nonatomic, retain) NSString *text;
-- (id)initWithString:(NSString *)text;
+@property (nonatomic, retain) NSString *string;
+- (id)initWithString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix;
 @end
 
 
 @implementation GRMustacheTextComponent
-@synthesize text=_text;
+@synthesize string=_string;
 
-+ (instancetype)textComponentWithString:(NSString *)text
++ (instancetype)textComponentWithString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
 {
-    return [[[self alloc] initWithString:text] autorelease];
+    return [[[self alloc] initWithString:string blank:blank prefix:prefix suffix:suffix] autorelease];
 }
 
 - (void)dealloc
 {
-    [_text release];
+    [_string release];
     [super dealloc];
 }
 
 #pragma mark <GRMustacheTemplateComponent>
 
-- (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(NSMutableString *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error
+- (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(GRMustacheBuffer *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error
 {
-    [buffer appendString:_text];
+    [buffer appendString:_string blank:_blank prefix:_prefix suffix:_suffix];
     return YES;
 }
 
@@ -59,12 +60,15 @@
 
 #pragma mark Private
 
-- (id)initWithString:(NSString *)text
+- (id)initWithString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
 {
-    NSAssert(text, @"WTF");
+    NSAssert(string, @"WTF");
     self = [self init];
     if (self) {
-        self.text = text;
+        self.string = string;
+        _blank = blank;
+        _prefix = prefix;
+        _suffix = suffix;
     }
     return self;
 }

@@ -24,6 +24,7 @@
 #import "GRMustacheContext_private.h"
 #import "GRMustacheTemplateRepository_private.h"
 #import "GRMustacheSectionTag_private.h"
+#import "GRMustacheBuffer_private.h"
 #import "GRMustacheRendering.h"
 
 @interface GRMustacheTemplate()<GRMustacheRendering>
@@ -100,14 +101,14 @@
 
 - (NSString *)renderContentWithContext:(GRMustacheContext *)context HTMLSafe:(BOOL *)HTMLSafe error:(NSError **)error
 {
-    NSMutableString *buffer = [NSMutableString string];
+    GRMustacheBuffer *buffer = [GRMustacheBuffer buffer];
     if (![self renderContentType:self.contentType inBuffer:buffer withContext:context error:error]) {
         return nil;
     }
     if (HTMLSafe) {
         *HTMLSafe = (self.contentType == GRMustacheContentTypeHTML);
     }
-    return buffer;
+    return [buffer string];
 }
 
 - (void)setBaseContext:(GRMustacheContext *)baseContext
@@ -126,7 +127,7 @@
 
 #pragma mark - <GRMustacheTemplateComponent>
 
-- (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(NSMutableString *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error
+- (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(GRMustacheBuffer *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error
 {
     if (!context) {
         // With a nil context, the method would return NO without setting the
@@ -135,15 +136,15 @@
         return NO;
     }
     
-    NSMutableString *needsEscapingBuffer = nil;
-    NSMutableString *renderingBuffer = nil;
+    GRMustacheBuffer *needsEscapingBuffer = nil;
+    GRMustacheBuffer *renderingBuffer = nil;
     
     if (requiredContentType == GRMustacheContentTypeHTML && (self.contentType != GRMustacheContentTypeHTML)) {
         // Self renders text, but is asked for HTML.
         // This happens when self is a text partial embedded in a HTML template.
         //
         // We'll have to HTML escape our rendering.
-        needsEscapingBuffer = [NSMutableString string];
+        needsEscapingBuffer = [GRMustacheBuffer buffer];
         renderingBuffer = needsEscapingBuffer;
     } else {
         // Self renders text and is asked for text,
@@ -164,7 +165,7 @@
     }
     
     if (needsEscapingBuffer) {
-        [buffer appendString:[GRMustache escapeHTML:needsEscapingBuffer]];
+        [buffer appendRendering:[GRMustache escapeHTML:[needsEscapingBuffer string]]];
     }
     
     return YES;

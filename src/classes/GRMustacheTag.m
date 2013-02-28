@@ -25,6 +25,7 @@
 #import "GRMustacheExpression_private.h"
 #import "GRMustacheToken_private.h"
 #import "GRMustacheContext_private.h"
+#import "GRMustacheBuffer_private.h"
 #import "GRMustache_private.h"
 #import "GRMustacheRendering.h"
 
@@ -108,7 +109,7 @@
 
 #pragma mark - <GRMustacheTemplateComponent>
 
-- (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(NSMutableString *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error
+- (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(GRMustacheBuffer *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error
 {
     NSAssert(requiredContentType == self.contentType, @"Not implemented");
     
@@ -223,8 +224,9 @@
                     if ((requiredContentType == GRMustacheContentTypeHTML) && !objectHTMLSafe && self.escapesHTML) {
                         rendering = [GRMustache escapeHTML:rendering];
                     }
-                    [buffer appendString:rendering];
                 }
+                
+                [buffer appendRendering:rendering];
                 
                 // Tag delegates post-rendering callbacks
                 

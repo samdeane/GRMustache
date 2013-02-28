@@ -1,17 +1,17 @@
 // The MIT License
-// 
+//
 // Copyright (c) 2013 Gwendal Roué
-// 
+//
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
 // in the Software without restriction, including without limitation the rights
 // to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
-// 
+//
 // The above copyright notice and this permission notice shall be included in
 // all copies or substantial portions of the Software.
-// 
+//
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -20,37 +20,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
 
+#import <objc/message.h>
+#import <Foundation/Foundation.h>
 #import "GRMustacheAvailabilityMacros_private.h"
-#import "GRMustacheTemplateComponent_private.h"
 
 /**
- * A GRMustacheTextComponent is a template component that renders raw template
- * text.
- *
- * For example, the template string "hello {{name}}!" would give two
- * GRMustacheTextComponent instances:
- *
- * - a GRMustacheTextComponent that renders "hello ".
- * - a GRMustacheTextComponent that renders "!".
- *
- * @see GRMustacheTemplateComponent
+ * TODO
  */
-@interface GRMustacheTextComponent: NSObject<GRMustacheTemplateComponent> {
+@interface GRMustacheBuffer : NSObject {
 @private
-    NSString *_string;
-    BOOL _blank;
-    BOOL _prefix;
-    BOOL _suffix;
+    NSMutableString *_string;
 }
 
 /**
- * Builds and returns a GRMustacheTextComponent.
- *
- * @param string  The string that should be rendered.
- * @return a GRMustacheTextComponent
+ * TODO
  */
-+ (instancetype)textComponentWithString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix GRMUSTACHE_API_INTERNAL;
++ (instancetype)buffer GRMUSTACHE_API_INTERNAL;
+
+/**
+ * TODO
+ */
+- (NSString *)string GRMUSTACHE_API_INTERNAL;
+
+/**
+ * TODO
+ */
+- (void)appendString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix GRMUSTACHE_API_INTERNAL;
+
+/**
+ * TODO
+ */
+- (void)appendRendering:(NSString *)string GRMUSTACHE_API_INTERNAL;
 
 @end
-
-

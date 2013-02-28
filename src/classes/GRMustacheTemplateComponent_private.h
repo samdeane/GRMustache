@@ -26,6 +26,7 @@
 
 @class GRMustacheContext;
 @class GRMustacheTemplateRepository;
+@class GRMustacheBuffer;
 
 /**
  * The protocol for "template components".
@@ -74,7 +75,7 @@
  *
  * @see GRMustacheContext
  */
-- (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(NSMutableString *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error GRMUSTACHE_API_INTERNAL;
+- (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(GRMustacheBuffer *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error GRMUSTACHE_API_INTERNAL;
 
 /**
  * In the context of overridable partials, return the component that should be
