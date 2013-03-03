@@ -117,6 +117,66 @@
       "data": { "subject": "--- " },
       "template": "<{{subject}}>",
       "expected": "<--- >"
+    },
+    {
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{present}}\n{{missing}}",
+      "expected": "---\n"
+    },
+    {
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{missing}}\n{{present}}",
+      "expected": "---"
+    },
+    {
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{present}}\n{{missing}}\n",
+      "expected": "---\n"
+    },
+    {
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{missing}}\n{{present}}\n",
+      "expected": "---\n"
+    },
+    {
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{present}}\n{{missing}}\n{{missing}}\n{{present}}\n{{missing}}\n{{present}}\n",
+      "expected": "---\n---\n---\n"
+    },
+    {
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{present}}  \n  {{missing}}  ",
+      "expected": "  ---  \n"
+    },
+    {
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{missing}}  \n  {{present}}  ",
+      "expected": "  ---  "
+    },
+    {
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{present}}  \n  {{missing}}  \n",
+      "expected": "  ---  \n"
+    },
+    {
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{missing}}  \n  {{present}}  \n",
+      "expected": "  ---  \n"
+    },
+    {
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{present}}  \n  {{missing}}  \n  {{missing}}  \n  {{missing}}  \n  {{present}}  \n  {{missing}}  \n  {{present}}  \n",
+      "expected": "  ---  \n  ---  \n  ---  \n"
     }
   ]
 }
