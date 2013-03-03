@@ -109,7 +109,6 @@
     if (HTMLSafe != NULL) {
         *HTMLSafe = (self.contentType == GRMustacheContentTypeHTML);
     }
-    [buffer flush];
     return rendering;
 }
 
@@ -138,8 +137,8 @@
         return NO;
     }
     
-    GRMustacheBuffer *localBuffer = [GRMustacheBuffer bufferWithContentType:_contentType outputBuffer:buffer];
-    
+    GRMustacheBuffer *localBuffer = (_contentType == buffer.contentType) ? buffer : [GRMustacheBuffer bufferWithContentType:_contentType outputBuffer:buffer];
+        
     for (id<GRMustacheTemplateComponent> component in _components) {
         // component may be overriden by a GRMustacheTemplateOverride: resolve it.
         component = [context resolveTemplateComponent:component];
@@ -149,8 +148,6 @@
             return NO;
         }
     }
-    
-    [localBuffer flush];
     
     return YES;
 }

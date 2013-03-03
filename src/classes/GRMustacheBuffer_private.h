@@ -24,13 +24,30 @@
 #import "GRMustacheAvailabilityMacros_private.h"
 #import "GRMustacheConfiguration_private.h"
 
+typedef NS_ENUM(NSInteger, GRMustacheBufferInputType) {
+    GRMustacheBufferInputTypeUserContent,
+    GRMustacheBufferInputTypeContent,
+    GRMustacheBufferInputTypeContentEndOfLine,
+    GRMustacheBufferInputTypeBlankLine,
+    GRMustacheBufferInputTypeBlankEndOfLine,
+    GRMustacheBufferInputTypeBlankPrefix,
+    GRMustacheBufferInputTypeBlankSuffix,
+};
+
 /**
  * TODO
  */
 @interface GRMustacheBuffer : NSObject {
 @private
     GRMustacheContentType _contentType;
+    NSString *_prefix;
+    BOOL _swallowsBlankEndOfLine;
 }
+
+/**
+ * TODO
+ */
+@property (nonatomic, readonly) GRMustacheContentType contentType;
 
 /**
  * TODO
@@ -45,15 +62,6 @@
 /**
  * TODO
  */
-- (void)appendString:(NSString *)string contentType:(GRMustacheContentType)contentType blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix GRMUSTACHE_API_INTERNAL;
+- (NSString *)appendString:(NSString *)string contentType:(GRMustacheContentType)contentType inputType:(GRMustacheBufferInputType)inputType GRMUSTACHE_API_INTERNAL;
 
-/**
- * TODO
- */
-- (NSString *)appendRendering:(NSString *)string contentType:(GRMustacheContentType)contentType GRMUSTACHE_API_INTERNAL;
-
-/**
- * TODO
- */
-- (void)flush GRMUSTACHE_API_INTERNAL;
 @end

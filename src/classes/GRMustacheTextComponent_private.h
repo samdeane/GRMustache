@@ -22,6 +22,7 @@
 
 #import "GRMustacheAvailabilityMacros_private.h"
 #import "GRMustacheTemplateComponent_private.h"
+#import "GRMustacheBuffer_private.h"
 
 /**
  * A GRMustacheTextComponent is a template component that renders raw template
@@ -38,18 +39,18 @@
 @interface GRMustacheTextComponent: NSObject<GRMustacheTemplateComponent> {
 @private
     NSString *_string;
-    BOOL _blank;
-    BOOL _prefix;
-    BOOL _suffix;
+    GRMustacheBufferInputType _inputType;
 }
 
 /**
  * Builds and returns a GRMustacheTextComponent.
  *
+ * TODO
+ *
  * @param string  The string that should be rendered.
  * @return a GRMustacheTextComponent
  */
-+ (instancetype)textComponentWithString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix GRMUSTACHE_API_INTERNAL;
++ (instancetype)textComponentWithString:(NSString *)string inputType:(GRMustacheBufferInputType)inputType GRMUSTACHE_API_INTERNAL;
 
 @end
 

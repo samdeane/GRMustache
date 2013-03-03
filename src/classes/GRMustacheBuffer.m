@@ -53,14 +53,14 @@
 #pragma mark - Abstract class GRMustacheBuffer
 
 @interface GRMustacheBuffer()
-@property (nonatomic, readonly) GRMustacheContentType contentType;
+@property (nonatomic, retain) NSString *prefix;
 - (id)initWithContentType:(GRMustacheContentType)contentType;
-- (void)appendSafeString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix;
-- (NSString *)appendSafeRendering:(NSString *)string;
+- (void)appendSafeString:(NSString *)string inputType:(GRMustacheBufferInputType)inputType;
 @end
 
 @implementation GRMustacheBuffer
 @synthesize contentType=_contentType;
+@synthesize prefix=_prefix;
 
 + (instancetype)bufferWithContentType:(GRMustacheContentType)contentType outputString:(NSMutableString *)outputString
 {
@@ -82,46 +82,101 @@
     self = [super init];
     if (self) {
         _contentType = contentType;
+        _swallowsBlankEndOfLine = YES;
     }
     return self;
 }
 
-- (void)appendString:(NSString *)string contentType:(GRMustacheContentType)contentType blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
+- (NSString *)appendString:(NSString *)string contentType:(GRMustacheContentType)contentType inputType:(GRMustacheBufferInputType)inputType
 {
-    if (string == nil) return;
+    if (string == nil) {
+        string = @"";
+    }
     if (_contentType == GRMustacheContentTypeHTML && contentType != GRMustacheContentTypeHTML) {
         string = [GRMustache escapeHTML:string];
     }
     
-    [self appendSafeString:string blank:blank prefix:prefix suffix:suffix];
-}
-
-- (NSString *)appendRendering:(NSString *)string contentType:(GRMustacheContentType)contentType
-{
-    if (string == nil) return @"";
-    if (_contentType == GRMustacheContentTypeHTML && contentType != GRMustacheContentTypeHTML) {
-        string = [GRMustache escapeHTML:string];
+    switch (inputType) {
+        case GRMustacheBufferInputTypeUserContent:
+            if (string.length > 0) {
+                if (self.prefix) {
+                    [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
+                    self.prefix = nil;
+                }
+                _swallowsBlankEndOfLine = NO;
+                [self appendSafeString:string inputType:inputType];
+                return string;
+            } else {
+                return @"";
+            }
+            break;
+            
+        case GRMustacheBufferInputTypeContent:
+            if (self.prefix) {
+                [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
+                self.prefix = nil;
+            }
+            _swallowsBlankEndOfLine = NO;
+            [self appendSafeString:string inputType:inputType];
+            return string;
+            break;
+            
+        case GRMustacheBufferInputTypeContentEndOfLine:
+            if (self.prefix) {
+                [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
+                self.prefix = nil;
+            }
+            _swallowsBlankEndOfLine = YES;
+            [self appendSafeString:string inputType:inputType];
+            return string;
+            break;
+            
+        case GRMustacheBufferInputTypeBlankLine:
+            _swallowsBlankEndOfLine = YES;
+            [self appendSafeString:string inputType:inputType];
+            return string;
+            break;
+            
+        case GRMustacheBufferInputTypeBlankEndOfLine:
+            if (_swallowsBlankEndOfLine) {
+                return @"";
+            } else {
+                if (self.prefix) {
+                    [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
+                    self.prefix = nil;
+                }
+                _swallowsBlankEndOfLine = YES;
+                [self appendSafeString:string inputType:inputType];
+                return string;
+            }
+            break;
+            
+        case GRMustacheBufferInputTypeBlankPrefix:
+            self.prefix = string;
+            _swallowsBlankEndOfLine = YES;
+            return string;
+            break;
+            
+        case GRMustacheBufferInputTypeBlankSuffix:
+            if (_swallowsBlankEndOfLine) {
+                return @"";
+            } else {
+                if (self.prefix) {
+                    [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
+                    self.prefix = nil;
+                }
+                _swallowsBlankEndOfLine = NO;
+                [self appendSafeString:string inputType:inputType];
+                return string;
+            }
+            break;
     }
-    
-    return [self appendSafeRendering:string];
 }
 
-- (void)flush
-{
-    
-}
-
-- (void)appendSafeString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
+- (void)appendSafeString:(NSString *)string inputType:(GRMustacheBufferInputType)inputType
 {
     NSAssert(NO, @"Subclasses must override");
 }
-
-- (NSString *)appendSafeRendering:(NSString *)string
-{
-    NSAssert(NO, @"Subclasses must override");
-    return nil;
-}
-
 
 @end
 
@@ -146,15 +201,9 @@
     return self;
 }
 
-- (void)appendSafeString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
+- (void)appendSafeString:(NSString *)string inputType:(GRMustacheBufferInputType)inputType
 {
     [_outputString appendString:string];
-}
-
-- (NSString *)appendSafeRendering:(NSString *)string
-{
-    [_outputString appendString:string];
-    return string;
 }
 
 @end
@@ -181,14 +230,9 @@
 }
 
 
-- (void)appendSafeString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
+- (void)appendSafeString:(NSString *)string inputType:(GRMustacheBufferInputType)inputType
 {
-    [_outputBuffer appendString:string contentType:self.contentType blank:blank prefix:prefix suffix:suffix];
-}
-
-- (NSString *)appendSafeRendering:(NSString *)string
-{
-    return [_outputBuffer appendRendering:string contentType:self.contentType];
+    [_outputBuffer appendString:string contentType:self.contentType inputType:inputType];
 }
 
 @end

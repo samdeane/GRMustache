@@ -26,16 +26,16 @@
 
 @interface GRMustacheTextComponent()
 @property (nonatomic, retain) NSString *string;
-- (id)initWithString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix;
+- (id)initWithString:(NSString *)string inputType:(GRMustacheBufferInputType)inputType;
 @end
 
 
 @implementation GRMustacheTextComponent
 @synthesize string=_string;
 
-+ (instancetype)textComponentWithString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
++ (instancetype)textComponentWithString:(NSString *)string inputType:(GRMustacheBufferInputType)inputType
 {
-    return [[[self alloc] initWithString:string blank:blank prefix:prefix suffix:suffix] autorelease];
+    return [[[self alloc] initWithString:string inputType:inputType] autorelease];
 }
 
 - (void)dealloc
@@ -48,7 +48,7 @@
 
 - (BOOL)renderContentType:(GRMustacheContentType)requiredContentType inBuffer:(GRMustacheBuffer *)buffer withContext:(GRMustacheContext *)context error:(NSError **)error
 {
-    [buffer appendString:_string contentType:requiredContentType blank:_blank prefix:_prefix suffix:_suffix];
+    [buffer appendString:_string contentType:requiredContentType inputType:_inputType];
     return YES;
 }
 
@@ -60,15 +60,13 @@
 
 #pragma mark Private
 
-- (id)initWithString:(NSString *)string blank:(BOOL)blank prefix:(BOOL)prefix suffix:(BOOL)suffix
+- (id)initWithString:(NSString *)string inputType:(GRMustacheBufferInputType)inputType
 {
     NSAssert(string, @"WTF");
     self = [self init];
     if (self) {
         self.string = string;
-        _blank = blank;
-        _prefix = prefix;
-        _suffix = suffix;
+        _inputType = inputType;
     }
     return self;
 }

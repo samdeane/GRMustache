@@ -239,7 +239,7 @@
             NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
             
             // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring blank:NO prefix:NO suffix:NO]];
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeContent]];
             break;
             
             
@@ -248,7 +248,7 @@
             NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
             
             // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring blank:YES prefix:YES suffix:YES]];
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlankLine]];
             break;
             
         case GRMustacheTokenTypeBlankEndOfLine:
@@ -256,7 +256,7 @@
             NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
             
             // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring blank:YES prefix:NO suffix:YES]];
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlankEndOfLine]];
             break;
             
         case GRMustacheTokenTypeBlankPrefix:
@@ -264,7 +264,7 @@
             NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
             
             // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring blank:YES prefix:YES suffix:NO]];
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlankPrefix]];
             break;
             
         case GRMustacheTokenTypeBlankSuffix:
@@ -272,7 +272,7 @@
             NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
             
             // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring blank:YES prefix:NO suffix:NO]];
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlankSuffix]];
             break;
             
             

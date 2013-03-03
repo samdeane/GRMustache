@@ -223,7 +223,7 @@
                     // promote
                     renderingContentType = GRMustacheContentTypeHTML;
                 }
-                rendering = [buffer appendRendering:rendering contentType:renderingContentType];
+                rendering = [buffer appendString:rendering contentType:renderingContentType inputType:GRMustacheBufferInputTypeUserContent];
                 
                 // Tag delegates post-rendering callbacks
                 

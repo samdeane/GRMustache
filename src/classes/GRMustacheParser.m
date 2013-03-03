@@ -550,13 +550,23 @@
             break;
             
         case stateSpaceRun: {
-            // Blank suffix
-            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankSuffix
-                                                     templateString:templateString
-                                                         templateID:templateID
-                                                               line:lineNumber
-                                                              range:(NSRange){ .location = start, .length = i-start}];
-            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
+            if (start == lineStart) {
+                // Content
+                GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                                                         templateString:templateString
+                                                             templateID:templateID
+                                                                   line:lineNumber
+                                                                  range:(NSRange){ .location = start, .length = i-start}];
+                if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
+            } else {
+                // Blank suffix
+                GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankSuffix
+                                                         templateString:templateString
+                                                             templateID:templateID
+                                                                   line:lineNumber
+                                                                  range:(NSRange){ .location = start, .length = i-start}];
+                if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
+            }
         } break;
             
         case stateContent: {

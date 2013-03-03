@@ -84,7 +84,6 @@
     if (HTMLSafe != NULL) {
         *HTMLSafe = (self.contentType == GRMustacheContentTypeHTML);
     }
-    [buffer flush];
     return rendering;
 }
 
