@@ -32,6 +32,16 @@ typedef NS_ENUM(NSInteger, GRMustacheTokenType) {
     /**
      * TODO
      */
+    GRMustacheTokenTypeContent,
+    
+    /**
+     * TODO
+     */
+    GRMustacheTokenTypeContentEndOfLine,
+    
+    /**
+     * TODO
+     */
     GRMustacheTokenTypeBlankLine,
 
     /**
@@ -48,11 +58,6 @@ typedef NS_ENUM(NSInteger, GRMustacheTokenType) {
      * TODO
      */
     GRMustacheTokenTypeBlankSuffix,
-    
-    /**
-     * TODO
-     */
-    GRMustacheTokenTypeContent,
     
     /**
      * The kind of tokens representing escaped variable tags such as `{{name}}`.

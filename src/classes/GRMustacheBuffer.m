@@ -97,10 +97,16 @@
     }
     
     switch (inputType) {
-        case GRMustacheBufferInputTypeUserContent:
+        case GRMustacheBufferInputTypeContent:
             if (string.length > 0) {
                 if (self.prefix) {
-                    [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
+                    if (_needsPrefixPrepending) {
+                        [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
+                        _needsPrefixPrepending = NO;
+                    } else {
+                        // noop for breakpoing
+                        _needsPrefixPrepending = NO;
+                    }
                     self.prefix = nil;
                 }
                 _swallowsBlankEndOfLine = NO;
@@ -111,19 +117,15 @@
             }
             break;
             
-        case GRMustacheBufferInputTypeContent:
-            if (self.prefix) {
-                [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
-                self.prefix = nil;
-            }
-            _swallowsBlankEndOfLine = NO;
-            [self appendSafeString:string inputType:inputType];
-            return string;
-            break;
-            
         case GRMustacheBufferInputTypeContentEndOfLine:
             if (self.prefix) {
-                [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
+                if (_needsPrefixPrepending) {
+                    [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
+                    _needsPrefixPrepending = NO;
+                } else {
+                    // noop for breakpoing
+                    _needsPrefixPrepending = NO;
+                }
                 self.prefix = nil;
             }
             _swallowsBlankEndOfLine = YES;
@@ -132,6 +134,8 @@
             break;
             
         case GRMustacheBufferInputTypeBlankLine:
+            self.prefix = nil;
+            _needsPrefixPrepending = NO;
             _swallowsBlankEndOfLine = YES;
             [self appendSafeString:string inputType:inputType];
             return string;
@@ -139,12 +143,9 @@
             
         case GRMustacheBufferInputTypeBlankEndOfLine:
             if (_swallowsBlankEndOfLine) {
+                _needsPrefixPrepending = NO;
                 return @"";
             } else {
-                if (self.prefix) {
-                    [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
-                    self.prefix = nil;
-                }
                 _swallowsBlankEndOfLine = YES;
                 [self appendSafeString:string inputType:inputType];
                 return string;
@@ -154,18 +155,15 @@
         case GRMustacheBufferInputTypeBlankPrefix:
             self.prefix = string;
             _swallowsBlankEndOfLine = YES;
+            _needsPrefixPrepending = YES;
             return string;
             break;
             
         case GRMustacheBufferInputTypeBlankSuffix:
             if (_swallowsBlankEndOfLine) {
+                _needsPrefixPrepending = NO;
                 return @"";
             } else {
-                if (self.prefix) {
-                    [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlankPrefix];
-                    self.prefix = nil;
-                }
-                _swallowsBlankEndOfLine = NO;
                 [self appendSafeString:string inputType:inputType];
                 return string;
             }

@@ -324,7 +324,7 @@
                 {
                     if (start != (i+1)) {
                         // Content
-                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
+                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContentEndOfLine
                                                                  templateString:templateString
                                                                      templateID:templateID
                                                                            line:lineNumber

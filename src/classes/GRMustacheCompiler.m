@@ -243,6 +243,15 @@
             break;
             
             
+        case GRMustacheTokenTypeContentEndOfLine:
+            // Parser validation
+            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
+            
+            // Success: append GRMustacheTextComponent
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeContentEndOfLine]];
+            break;
+            
+            
         case GRMustacheTokenTypeBlankLine:
             // Parser validation
             NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
