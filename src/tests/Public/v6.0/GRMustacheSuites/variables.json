@@ -177,6 +177,20 @@
       "data": { "present": "---" },
       "template": "  {{present}}  \n  {{missing}}  \n  {{missing}}  \n  {{missing}}  \n  {{present}}  \n  {{missing}}  \n  {{present}}  \n",
       "expected": "  ---  \n  ---  \n  ---  \n"
+    },
+    {
+      // first failing example from https://github.com/groue/GRMustache/issues/46#issuecomment-14354838
+      "name": "Prefixes of skipped lines do not pollute surrounding lines",
+      "data": { "present": "---" },
+      "template": "{{present}}\n  {{missing}}  \n{{present}}\n",
+      "expected": "---\n---\n"
+    },
+    {
+      // second failing example from https://github.com/groue/GRMustache/issues/46#issuecomment-14354838
+      "name": "Prefixes of skipped lines do not pollute surrounding lines",
+      "data": { "present": "---" },
+      "template": "{{missing}}\n...{{present}}...\n{{missing}}\n...{{present}}...\n{{missing}}\n",
+      "expected": "...---...\n...---...\n"
     }
   ]
 }
