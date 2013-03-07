@@ -27,10 +27,8 @@
 typedef NS_ENUM(NSInteger, GRMustacheBufferInputType) {
     GRMustacheBufferInputTypeContent,
     GRMustacheBufferInputTypeContentEndOfLine,
-    GRMustacheBufferInputTypeBlankLine,
+    GRMustacheBufferInputTypeBlank,
     GRMustacheBufferInputTypeBlankEndOfLine,
-    GRMustacheBufferInputTypeBlankPrefix,
-    GRMustacheBufferInputTypeBlankSuffix,
 };
 
 /**
@@ -40,8 +38,7 @@ typedef NS_ENUM(NSInteger, GRMustacheBufferInputType) {
 @private
     GRMustacheContentType _contentType;
     NSString *_prefix;
-    BOOL _swallowsBlankEndOfLine;
-    BOOL _needsPrefixPrepending;
+    BOOL _atLineStart;
 }
 
 /**
@@ -63,5 +60,10 @@ typedef NS_ENUM(NSInteger, GRMustacheBufferInputType) {
  * TODO
  */
 - (NSString *)appendString:(NSString *)string contentType:(GRMustacheContentType)contentType inputType:(GRMustacheBufferInputType)inputType GRMUSTACHE_API_INTERNAL;
+
+/**
+ * TODO
+ */
+- (void)flush GRMUSTACHE_API_INTERNAL;
 
 @end

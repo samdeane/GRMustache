@@ -159,23 +159,13 @@
                 }
                 else if (c == '\n')
                 {
-                    if (lineStart == start) {
-                        // Blank line
-                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankLine
-                                                                 templateString:templateString
-                                                                     templateID:templateID
-                                                                           line:lineNumber
-                                                                          range:(NSRange){ .location = lineStart, .length = (i+1)-lineStart}];
-                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-                    } else {
-                        // Blank end of line
-                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankEndOfLine
-                                                                 templateString:templateString
-                                                                     templateID:templateID
-                                                                           line:lineNumber
-                                                                          range:(NSRange){ .location = start, .length = (i+1)-start}];
-                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-                    }
+                    // Blank end of line
+                    GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankEndOfLine
+                                                             templateString:templateString
+                                                                 templateID:templateID
+                                                                       line:lineNumber
+                                                                      range:(NSRange){ .location = start, .length = (i+1)-start}];
+                    if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     ++lineNumber;
                     lineStart = start = i + 1;
                     state = stateStart;
@@ -214,23 +204,13 @@
                 }
                 else if (c == '\n')
                 {
-                    if (lineStart == start) {
-                        // Blank line
-                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankLine
-                                                                 templateString:templateString
-                                                                     templateID:templateID
-                                                                           line:lineNumber
-                                                                          range:(NSRange){ .location = lineStart, .length = (i+1)-lineStart}];
-                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-                    } else {
-                        // Blank end of line
-                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankEndOfLine
-                                                                 templateString:templateString
-                                                                     templateID:templateID
-                                                                           line:lineNumber
-                                                                          range:(NSRange){ .location = start, .length = (i+1)-start}];
-                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-                    }
+                    // Blank end of line
+                    GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankEndOfLine
+                                                             templateString:templateString
+                                                                 templateID:templateID
+                                                                       line:lineNumber
+                                                                      range:(NSRange){ .location = start, .length = (i+1)-start}];
+                    if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     ++lineNumber;
                     lineStart = start = i + 1;
                     state = stateStart;
@@ -238,23 +218,13 @@
                 else if (c == unescapedTagStartDelimiterInitial && (i+unescapedTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, unescapedTagStartDelimiterLength)] isEqualToString:unescapedTagStartDelimiter])
                 {
                     if (start != i) {
-                        if (lineStart == start) {
-                            // Blank prefix
-                            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankPrefix
-                                                                     templateString:templateString
-                                                                         templateID:templateID
-                                                                               line:lineNumber
-                                                                              range:(NSRange){ .location = start, .length = i-start}];
-                            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-                        } else {
-                            // Content
-                            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                                     templateString:templateString
-                                                                         templateID:templateID
-                                                                               line:lineNumber
-                                                                              range:(NSRange){ .location = start, .length = i-start}];
-                            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-                        }
+                        // Blank
+                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlank
+                                                                 templateString:templateString
+                                                                     templateID:templateID
+                                                                           line:lineNumber
+                                                                          range:(NSRange){ .location = start, .length = i-start}];
+                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     }
                     tagStartLineNumber = lineNumber;
                     start = i;
@@ -264,23 +234,13 @@
                 else if (c == setDelimitersTagStartDelimiterInitial && (i+setDelimitersTagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, setDelimitersTagStartDelimiterLength)] isEqualToString:setDelimitersTagStartDelimiter])
                 {
                     if (start != i) {
-                        if (lineStart == start) {
-                            // Blank prefix
-                            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankPrefix
-                                                                     templateString:templateString
-                                                                         templateID:templateID
-                                                                               line:lineNumber
-                                                                              range:(NSRange){ .location = start, .length = i-start}];
-                            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-                        } else {
-                            // Content
-                            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                                     templateString:templateString
-                                                                         templateID:templateID
-                                                                               line:lineNumber
-                                                                              range:(NSRange){ .location = start, .length = i-start}];
-                            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-                        }
+                        // Blank
+                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlank
+                                                                 templateString:templateString
+                                                                     templateID:templateID
+                                                                           line:lineNumber
+                                                                          range:(NSRange){ .location = start, .length = i-start}];
+                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     }
                     tagStartLineNumber = lineNumber;
                     start = i;
@@ -290,23 +250,13 @@
                 else if (c == tagStartDelimiterInitial && (i+tagStartDelimiterLength <= length) && [[templateString substringWithRange:NSMakeRange(i, tagStartDelimiterLength)] isEqualToString:self.tagStartDelimiter])
                 {
                     if (start != i) {
-                        if (lineStart == start) {
-                            // Blank prefix
-                            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankPrefix
-                                                                     templateString:templateString
-                                                                         templateID:templateID
-                                                                               line:lineNumber
-                                                                              range:(NSRange){ .location = start, .length = i-start}];
-                            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-                        } else {
-                            // Content
-                            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                                     templateString:templateString
-                                                                         templateID:templateID
-                                                                               line:lineNumber
-                                                                              range:(NSRange){ .location = start, .length = i-start}];
-                            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-                        }
+                        // Blank
+                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlank
+                                                                 templateString:templateString
+                                                                     templateID:templateID
+                                                                           line:lineNumber
+                                                                          range:(NSRange){ .location = start, .length = i-start}];
+                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
                     }
                     tagStartLineNumber = lineNumber;
                     start = i;
@@ -550,23 +500,13 @@
             break;
             
         case stateSpaceRun: {
-            if (start == lineStart) {
-                // Content
-                GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContent
-                                                         templateString:templateString
-                                                             templateID:templateID
-                                                                   line:lineNumber
-                                                                  range:(NSRange){ .location = start, .length = i-start}];
-                if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-            } else {
-                // Blank suffix
-                GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankSuffix
-                                                         templateString:templateString
-                                                             templateID:templateID
-                                                                   line:lineNumber
-                                                                  range:(NSRange){ .location = start, .length = i-start}];
-                if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
-            }
+            // Blank
+            GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlank
+                                                     templateString:templateString
+                                                         templateID:templateID
+                                                               line:lineNumber
+                                                              range:(NSRange){ .location = start, .length = i-start}];
+            if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
         } break;
             
         case stateContent: {

@@ -252,12 +252,12 @@
             break;
             
             
-        case GRMustacheTokenTypeBlankLine:
+        case GRMustacheTokenTypeBlank:
             // Parser validation
             NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
             
             // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlankLine]];
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlank]];
             break;
             
         case GRMustacheTokenTypeBlankEndOfLine:
@@ -267,23 +267,6 @@
             // Success: append GRMustacheTextComponent
             [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlankEndOfLine]];
             break;
-            
-        case GRMustacheTokenTypeBlankPrefix:
-            // Parser validation
-            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
-            
-            // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlankPrefix]];
-            break;
-            
-        case GRMustacheTokenTypeBlankSuffix:
-            // Parser validation
-            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
-            
-            // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlankSuffix]];
-            break;
-            
             
         case GRMustacheTokenTypeEscapedVariable: {
             // Expression validation

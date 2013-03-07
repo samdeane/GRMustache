@@ -29,35 +29,10 @@
  * The kinds of tokens
  */
 typedef NS_ENUM(NSInteger, GRMustacheTokenType) {
-    /**
-     * TODO
-     */
     GRMustacheTokenTypeContent,
-    
-    /**
-     * TODO
-     */
     GRMustacheTokenTypeContentEndOfLine,
-    
-    /**
-     * TODO
-     */
-    GRMustacheTokenTypeBlankLine,
-
-    /**
-     * TODO
-     */
+    GRMustacheTokenTypeBlank,
     GRMustacheTokenTypeBlankEndOfLine,
-    
-    /**
-     * TODO
-     */
-    GRMustacheTokenTypeBlankPrefix,
-    
-    /**
-     * TODO
-     */
-    GRMustacheTokenTypeBlankSuffix,
     
     /**
      * The kind of tokens representing escaped variable tags such as `{{name}}`.

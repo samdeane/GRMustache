@@ -279,6 +279,7 @@ static struct {
                 
                 if (![expectedRendering isEqualToString:rendering]) {
                     // Allow breakpoint for failing tests
+                    block(&template, &error);
                     [template renderObject:object error:&error];
                 }
                 
@@ -287,6 +288,7 @@ static struct {
                 // error was expected
                 
                 // Allow breakpoint for failing tests
+                block(&template, &error);
                 [template renderObject:object error:&error];
                 
                 STAssertTrue(NO, @"Unexpected rendering: %@: %@", rendering, testDescription);
@@ -300,12 +302,14 @@ static struct {
                 }];
                 if (!match) {
                     // Allow breakpoint for failing tests
+                    block(&template, &error);
                     [template renderObject:object error:&error];
                     
                     STAssertTrue(NO, @"Unexpected error: %@: %@", error.localizedDescription, testDescription);
                 }
             } else {
                 // Allow breakpoint for failing tests
+                block(&template, &error);
                 [template renderObject:object error:&error];
                 
                 STAssertTrue(NO, @"Unexpected error: %@: %@", error.localizedDescription, testDescription);

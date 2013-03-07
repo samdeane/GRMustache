@@ -81,6 +81,8 @@
         }
     }
     
+    [buffer flush];
+    
     if (HTMLSafe != NULL) {
         *HTMLSafe = (self.contentType == GRMustacheContentTypeHTML);
     }

@@ -103,9 +103,13 @@
 {
     NSMutableString *rendering = [NSMutableString string];
     GRMustacheBuffer *buffer = [GRMustacheBuffer bufferWithContentType:self.contentType outputString:rendering];
+    
     if (![self renderContentType:_contentType inBuffer:buffer withContext:context error:error]) {
         return nil;
     }
+    
+    [buffer flush];
+    
     if (HTMLSafe != NULL) {
         *HTMLSafe = (self.contentType == GRMustacheContentTypeHTML);
     }
@@ -148,6 +152,8 @@
             return NO;
         }
     }
+    
+    [localBuffer flush];
     
     return YES;
 }
