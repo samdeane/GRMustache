@@ -36,6 +36,7 @@ static struct {
     NSString *data;
     NSString *expected;
     NSString *expected_error;
+    NSString *configuration;
 } GRMustachePublicAPITestItemKeys = {
     .partials = @"partials",
     .template = @"template",
@@ -44,6 +45,7 @@ static struct {
     .data = @"data",
     .expected = @"expected",
     .expected_error = @"expected_error",
+    .configuration = @"configuration",
 };
 
 
@@ -85,6 +87,8 @@ static struct {
         NSString *expectedError = [testDictionary objectForKey:GRMustachePublicAPITestItemKeys.expected_error];
         NSDictionary *templatesDictionary = [testDictionary objectForKey:GRMustachePublicAPITestItemKeys.partials];
         NSRegularExpression *expectedErrorReg = nil;
+        NSDictionary *configurationRepresentation = [testDictionary objectForKey:GRMustachePublicAPITestItemKeys.configuration];
+        GRMustacheConfiguration *configuration = [GRMustacheConfiguration configuration];
         
         
         // data is mandatory
@@ -167,6 +171,20 @@ static struct {
         }
         
         
+        // configuration, if present, must be a dictionary
+        
+        if (configurationRepresentation) {
+            STAssertTrue([configurationRepresentation isKindOfClass:[NSDictionary class]], @"`%@` key is not an object in %@", GRMustachePublicAPITestItemKeys.configuration, testDescription);
+            if (![configurationRepresentation isKindOfClass:[NSDictionary class]]) continue;
+        }
+        
+        if (configurationRepresentation) {
+            [configurationRepresentation enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+                [configuration setValue:obj forKey:key];
+            }];
+        }
+        
+        
         // run test
         
         if (templateName) {
@@ -200,6 +218,7 @@ static struct {
                                             *template = [self templateForTemplateNamed:templateName
                                                                          templatesPath:templatesPath
                                                                               encoding:encoding
+                                                                         configuration:configuration
                                                                                  error:error];
                                         }];
                 }
@@ -215,6 +234,7 @@ static struct {
                                             *template = [self templateForTemplateNamed:templateName
                                                                           templatesURL:[NSURL fileURLWithPath:templatesPath]
                                                                               encoding:encoding
+                                                                         configuration:configuration
                                                                                  error:error];
                                         }];
                 }
@@ -236,31 +256,35 @@ static struct {
                                 template:^(GRMustacheTemplate **template, NSError **error) {
                                     *template = [self templateForTemplateString:templateString
                                                              partialsDictionary:templatesDictionary
+                                                                  configuration:configuration
                                                                           error:error];
                                 }];
         }
     }
 }
 
-- (GRMustacheTemplate *)templateForTemplateString:(NSString *)templateString partialsDictionary:(NSDictionary *)partialsDictionary error:(NSError **)error
+- (GRMustacheTemplate *)templateForTemplateString:(NSString *)templateString partialsDictionary:(NSDictionary *)partialsDictionary configuration:(GRMustacheConfiguration *)configuration error:(NSError **)error
 {
     GRMustacheTemplateRepository *repository = [GRMustacheTemplateRepository templateRepositoryWithDictionary:partialsDictionary];
+    repository.configuration = configuration;
     return [repository templateFromString:templateString error:error];
 }
 
-- (GRMustacheTemplate *)templateForTemplateNamed:(NSString *)templateName templatesPath:(NSString *)templatesPath encoding:(NSStringEncoding)encoding error:(NSError **)error
+- (GRMustacheTemplate *)templateForTemplateNamed:(NSString *)templateName templatesPath:(NSString *)templatesPath encoding:(NSStringEncoding)encoding configuration:(GRMustacheConfiguration *)configuration error:(NSError **)error
 {
     GRMustacheTemplateRepository *repository = [GRMustacheTemplateRepository templateRepositoryWithDirectory:templatesPath
                                                                                            templateExtension:[templateName pathExtension]
                                                                                                     encoding:encoding];
+    repository.configuration = configuration;
     return [repository templateNamed:[templateName stringByDeletingPathExtension] error:error];
 }
 
-- (GRMustacheTemplate *)templateForTemplateNamed:(NSString *)templateName templatesURL:(NSURL *)templatesURL encoding:(NSStringEncoding)encoding error:(NSError **)error
+- (GRMustacheTemplate *)templateForTemplateNamed:(NSString *)templateName templatesURL:(NSURL *)templatesURL encoding:(NSStringEncoding)encoding configuration:(GRMustacheConfiguration *)configuration error:(NSError **)error
 {
     GRMustacheTemplateRepository *repository = [GRMustacheTemplateRepository templateRepositoryWithBaseURL:templatesURL
                                                                                          templateExtension:[templateName pathExtension]
                                                                                                   encoding:encoding];
+    repository.configuration = configuration;
     return [repository templateNamed:[templateName stringByDeletingPathExtension] error:error];
 }
 

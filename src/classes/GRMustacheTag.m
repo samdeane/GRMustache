@@ -26,6 +26,8 @@
 #import "GRMustacheToken_private.h"
 #import "GRMustacheContext_private.h"
 #import "GRMustacheBuffer_private.h"
+#import "GRMustacheTemplateRepository_private.h"
+#import "GRMustacheConfiguration_private.h"
 #import "GRMustache_private.h"
 #import "GRMustacheRendering.h"
 
@@ -223,7 +225,11 @@
                     // promote
                     renderingContentType = GRMustacheContentTypeHTML;
                 }
-                rendering = [buffer appendString:rendering contentType:renderingContentType inputType:GRMustacheBufferInputTypeContent];
+                if (self.templateRepository.configuration.stripsBlankLines) {
+                    rendering = [buffer appendString:rendering contentType:renderingContentType inputType:GRMustacheBufferInputTypeStrippableContent];
+                } else {
+                    rendering = [buffer appendString:rendering contentType:renderingContentType inputType:GRMustacheBufferInputTypeContent];
+                }
                 
                 // Tag delegates post-rendering callbacks
                 

@@ -25,6 +25,7 @@
 #import "GRMustacheConfiguration_private.h"
 
 typedef NS_ENUM(NSInteger, GRMustacheBufferInputType) {
+    GRMustacheBufferInputTypeStrippableContent,
     GRMustacheBufferInputTypeContent,
     GRMustacheBufferInputTypeContentEndOfLine,
     GRMustacheBufferInputTypeBlank,

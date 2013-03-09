@@ -158,6 +158,7 @@
         _openingTokenStack = [[NSMutableArray alloc] initWithCapacity:20];
         _tagValueStack = [[NSMutableArray alloc] initWithCapacity:20];
         _contentType = configuration.contentType;
+        _stripsBlankLines = configuration.stripsBlankLines;
         _contentTypeLocked = NO;
     }
     return self;
@@ -239,7 +240,11 @@
             NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
             
             // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeContent]];
+            if (_stripsBlankLines) {
+                [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeStrippableContent]];
+            } else {
+                [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeContent]];
+            }
             break;
             
             

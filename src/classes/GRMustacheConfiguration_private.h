@@ -40,6 +40,7 @@ typedef NS_ENUM(NSUInteger, GRMustacheContentType) {
     NSString *_tagStartDelimiter;
     NSString *_tagEndDelimiter;
     GRMustacheContext *_baseContext;
+    BOOL _stripsBlankLines;
     BOOL _locked;
 }
 
@@ -52,6 +53,9 @@ typedef NS_ENUM(NSUInteger, GRMustacheContentType) {
 
 // Documented in GRMustacheConfiguration.h
 @property (nonatomic) GRMustacheContentType contentType GRMUSTACHE_API_PUBLIC;
+
+// Documented in GRMustacheConfiguration.h
+@property (nonatomic) BOOL stripsBlankLines GRMUSTACHE_API_PUBLIC;
 
 // Documented in GRMustacheConfiguration.h
 @property (nonatomic, copy) NSString *tagStartDelimiter GRMUSTACHE_API_PUBLIC;

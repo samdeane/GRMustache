@@ -1,0 +1,335 @@
+{
+  "tests": [
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{missing}}\n{{present}}",
+      "expected": "---"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { },
+      "template": "{{missing}}\n---",
+      "expected": "---"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{present}}\n{{missing}}\n",
+      "expected": "---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { },
+      "template": "---\n{{missing}}\n",
+      "expected": "---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{missing}}\n{{present}}\n",
+      "expected": "---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { },
+      "template": "{{missing}}\n---\n",
+      "expected": "---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{present}}\n{{missing}}\n{{missing}}\n{{present}}\n{{missing}}\n{{present}}\n",
+      "expected": "---\n---\n---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag are not rendered.",
+      "data": { },
+      "template": "---\n{{missing}}\n{{missing}}\n---\n{{missing}}\n---\n",
+      "expected": "---\n---\n---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag prefixed by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{missing}}\n  {{present}}",
+      "expected": "  ---"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag prefixed by white space are not rendered.",
+      "data": { },
+      "template": "  {{missing}}\n  ---",
+      "expected": "  ---"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag prefixed by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{present}}\n  {{missing}}\n",
+      "expected": "  ---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag prefixed by white space are not rendered.",
+      "data": { },
+      "template": "  ---\n  {{missing}}\n",
+      "expected": "  ---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag prefixed by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{missing}}\n  {{present}}\n",
+      "expected": "  ---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag prefixed by white space are not rendered.",
+      "data": { },
+      "template": "  {{missing}}\n  ---\n",
+      "expected": "  ---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag prefixed by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{present}}\n  {{missing}}\n  {{missing}}\n  {{missing}}\n  {{present}}\n  {{missing}}\n  {{present}}\n",
+      "expected": "  ---\n  ---\n  ---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag prefixed by white space are not rendered.",
+      "data": { },
+      "template": "  ---\n  {{missing}}\n  {{missing}}\n  {{missing}}\n  ---\n  {{missing}}\n  ---\n",
+      "expected": "  ---\n  ---\n  ---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag followed by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{missing}}  \n{{present}}  ",
+      "expected": "---  "
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag followed by white space are not rendered.",
+      "data": { },
+      "template": "{{missing}}  \n---  ",
+      "expected": "---  "
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag followed by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{present}}  \n{{missing}}  \n",
+      "expected": "---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag followed by white space are not rendered.",
+      "data": { },
+      "template": "---  \n{{missing}}  \n",
+      "expected": "---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag followed by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{missing}}  \n{{present}}  \n",
+      "expected": "---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag followed by white space are not rendered.",
+      "data": { },
+      "template": "{{missing}}  \n---  \n",
+      "expected": "---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag followed by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "{{present}}  \n{{missing}}  \n{{missing}}  \n{{missing}}  \n{{present}}  \n{{missing}}  \n{{present}}  \n",
+      "expected": "---  \n---  \n---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag followed by white space are not rendered.",
+      "data": { },
+      "template": "---  \n{{missing}}  \n{{missing}}  \n{{missing}}  \n---  \n{{missing}}  \n---  \n",
+      "expected": "---  \n---  \n---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{missing}}  \n  {{present}}  ",
+      "expected": "  ---  "
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { },
+      "template": "  {{missing}}  \n  ---  ",
+      "expected": "  ---  "
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{present}}  \n  {{missing}}  \n",
+      "expected": "  ---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { },
+      "template": "  ---  \n  {{missing}}  \n",
+      "expected": "  ---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{missing}}  \n  {{present}}  \n",
+      "expected": "  ---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { },
+      "template": "  {{missing}}  \n  ---  \n",
+      "expected": "  ---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { "present": "---" },
+      "template": "  {{present}}  \n  {{missing}}  \n  {{missing}}  \n  {{missing}}  \n  {{present}}  \n  {{missing}}  \n  {{present}}  \n",
+      "expected": "  ---  \n  ---  \n  ---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered.",
+      "data": { },
+      "template": "  ---  \n  {{missing}}  \n  {{missing}}  \n  {{missing}}  \n  ---  \n  {{missing}}  \n  ---  \n",
+      "expected": "  ---  \n  ---  \n  ---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag prefixed by white space are rendered if they don't end with a new line.",
+      "data": { "present": "---" },
+      "template": "  {{present}}\n  {{missing}}",
+      "expected": "  ---\n  "
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag prefixed by white space are rendered if they don't end with a new line.",
+      "data": { },
+      "template": "  ---\n  {{missing}}",
+      "expected": "  ---\n  "
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag followed by white space are rendered if they don't end with a new line.",
+      "data": { "present": "---" },
+      "template": "{{present}}  \n{{missing}}  ",
+      "expected": "---  \n  "
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag followed by white space are rendered if they don't end with a new line.",
+      "data": { },
+      "template": "---  \n{{missing}}  ",
+      "expected": "---  \n  "
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag surrounded by white space are rendered if they don't end with a new line.",
+      "data": { "present": "---" },
+      "template": "  {{present}}  \n  {{missing}}  ",
+      "expected": "  ---  \n    "
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing a single empty variable tag surrounded by white space are rendered if they don't end with a new line.",
+      "data": { },
+      "template": "  ---  \n  {{missing}}  ",
+      "expected": "  ---  \n    "
+    },
+    {
+      // first failing example from https://github.com/groue/GRMustache/issues/46#issuecomment-14354838
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Prefixes of skipped lines do not pollute surrounding lines",
+      "data": { "present": "---" },
+      "template": "{{present}}\n  {{missing}}  \n{{present}}\n",
+      "expected": "---\n---\n"
+    },
+    {
+      // second failing example from https://github.com/groue/GRMustache/issues/46#issuecomment-14354838
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Non-blank suffixes do not prevent blank line skipping",
+      "data": { "present": "---" },
+      "template": "{{missing}}\n...{{present}}...\n{{missing}}\n...{{present}}...\n{{missing}}\n",
+      "expected": "...---...\n...---...\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Blank line with several empty tags do not render",
+      "data": { },
+      "template": "{{missing}} {{missing}}\n",
+      "expected": ""
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "TODO",
+      "data": { "present": "---" },
+      "template": " {{missing}} {{present}}\n",
+      "expected": "  ---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "TODO",
+      "data": { "present": "---" },
+      "template": " {{missing}}{{present}}\n",
+      "expected": " ---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "TODO",
+      "data": { "present": "---" },
+      "template": "{{missing}}{{present}}\n",
+      "expected": "---\n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "TODO",
+      "data": { "present": "---" },
+      "template": " {{missing}} {{present}}",
+      "expected": "  ---"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "TODO",
+      "data": { "present": "---" },
+      "template": " {{missing}}{{present}}",
+      "expected": " ---"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "TODO",
+      "data": { "present": "---" },
+      "template": "{{missing}}{{present}}",
+      "expected": "---"
+    }
+  ]
+}

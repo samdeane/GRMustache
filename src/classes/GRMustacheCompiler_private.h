@@ -75,6 +75,7 @@
     NSMutableArray *_tagValueStack;
     
     GRMustacheTemplateRepository *_templateRepository;
+    BOOL _stripsBlankLines;
     GRMustacheContentType _contentType;
     BOOL _contentTypeLocked;
 }

@@ -32,6 +32,7 @@ static GRMustacheConfiguration *defaultConfiguration;
 
 @implementation GRMustacheConfiguration
 @synthesize contentType=_contentType;
+@synthesize stripsBlankLines=_stripsBlankLines;
 @synthesize tagStartDelimiter=_tagStartDelimiter;
 @synthesize tagEndDelimiter=_tagEndDelimiter;
 @synthesize baseContext=_baseContext;
@@ -65,6 +66,7 @@ static GRMustacheConfiguration *defaultConfiguration;
     self = [super init];
     if (self) {
         _contentType = GRMustacheContentTypeHTML;
+        _stripsBlankLines = NO;
         _tagStartDelimiter = [@"{{" retain];    // useless retain that matches the release in dealloc
         _tagEndDelimiter = [@"}}" retain];      // useless retain that matches the release in dealloc
         _baseContext = [[GRMustacheContext contextWithObject:[GRMustache standardLibrary]] retain];
@@ -129,6 +131,13 @@ static GRMustacheConfiguration *defaultConfiguration;
     }
 }
 
+- (void)setStripsBlankLines:(BOOL)stripsBlankLines
+{
+    [self assertNotLocked];
+    
+    _stripsBlankLines = stripsBlankLines;
+}
+
 
 #pragma mark - <NSCopying>
 
@@ -139,6 +148,7 @@ static GRMustacheConfiguration *defaultConfiguration;
     configuration.tagStartDelimiter = self.tagStartDelimiter;
     configuration.tagEndDelimiter = self.tagEndDelimiter;
     configuration.baseContext = self.baseContext;
+    configuration.stripsBlankLines = self.stripsBlankLines;
     return configuration;
 }
 

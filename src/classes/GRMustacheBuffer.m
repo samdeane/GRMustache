@@ -97,7 +97,7 @@
     }
     
     switch (inputType) {
-        case GRMustacheBufferInputTypeContent:
+        case GRMustacheBufferInputTypeStrippableContent:
             if (string.length > 0) {
                 if (self.prefix) {
                     [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlank];
@@ -114,6 +114,15 @@
                 return @"";
             }
             break;
+            
+        case GRMustacheBufferInputTypeContent:
+            if (self.prefix) {
+                [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlank];
+                self.prefix = nil;
+            }
+            [self appendSafeString:string inputType:inputType];
+            _atLineStart = NO;
+            return string;
             
         case GRMustacheBufferInputTypeContentEndOfLine:
             if (self.prefix) {

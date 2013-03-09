@@ -100,6 +100,7 @@ typedef NS_ENUM(NSUInteger, GRMustacheContentType) {
     NSString *_tagStartDelimiter;
     NSString *_tagEndDelimiter;
     GRMustacheContext *_baseContext;
+    BOOL _stripsBlankLines;
     BOOL _locked;
 }
 
@@ -193,6 +194,12 @@ typedef NS_ENUM(NSUInteger, GRMustacheContentType) {
  * @since v6.2
  */
 @property (nonatomic) GRMustacheContentType contentType AVAILABLE_GRMUSTACHE_VERSION_6_2_AND_LATER;
+
+/**
+ * TODO
+ */
+#warning Missing availability macro and @since declaration
+@property (nonatomic) BOOL stripsBlankLines;
 
 /**
  * The opening delimiter for Mustache tags. Its default value is @"{{".
