@@ -158,7 +158,6 @@
         _openingTokenStack = [[NSMutableArray alloc] initWithCapacity:20];
         _tagValueStack = [[NSMutableArray alloc] initWithCapacity:20];
         _contentType = configuration.contentType;
-        _stripsBlankLines = configuration.stripsBlankLines;
         _contentTypeLocked = NO;
     }
     return self;
@@ -214,7 +213,9 @@
     switch (token.type) {
         case GRMustacheTokenTypeSetDelimiter:
         case GRMustacheTokenTypeComment:
-            // Ignore
+            // ignore
+//            // insert strippable text component
+//            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:@"" inputType:GRMustacheBufferInputTypeStrippableContent]];
             break;
             
         case GRMustacheTokenTypePragma: {
@@ -237,20 +238,16 @@
             
         case GRMustacheTokenTypeContent:
             // Parser validation
-            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
+            NSAssert(token.templateSubstring.length > 0, @"WTF empty GRMustacheTokenTypeContent");
             
             // Success: append GRMustacheTextComponent
-            if (_stripsBlankLines) {
-                [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeStrippableContent]];
-            } else {
-                [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeContent]];
-            }
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeContent]];
             break;
             
             
         case GRMustacheTokenTypeContentEndOfLine:
             // Parser validation
-            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
+            NSAssert(token.templateSubstring.length > 0, @"WTF empty GRMustacheTokenTypeContentEndOfLine");
             
             // Success: append GRMustacheTextComponent
             [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeContentEndOfLine]];
@@ -259,7 +256,7 @@
             
         case GRMustacheTokenTypeBlank:
             // Parser validation
-            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
+            NSAssert(token.templateSubstring.length > 0, @"WTF empty GRMustacheTokenTypeBlank");
             
             // Success: append GRMustacheTextComponent
             [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlank]];
@@ -267,7 +264,7 @@
             
         case GRMustacheTokenTypeBlankEndOfLine:
             // Parser validation
-            NSAssert(token.templateSubstring.length > 0, @"WTF parser?");
+            NSAssert(token.templateSubstring.length > 0, @"WTF empty GRMustacheTokenTypeBlankEndOfLine");
             
             // Success: append GRMustacheTextComponent
             [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlankEndOfLine]];
@@ -513,7 +510,7 @@
                     }
                     
                     if (_currentTagValue == nil) {
-                        NSAssert(_currentTagValue, @"WTF");
+                        NSAssert(_currentTagValue, @"WTF expected _currentTagValue");
                     }
                     if (expression && ![expression isEqual:_currentTagValue]) {
                         [self failWithFatalError:[self parseErrorAtToken:token description:[NSString stringWithFormat:@"Unexpected %@ closing tag", token.templateSubstring]]];
@@ -570,11 +567,11 @@
                 } break;
                     
                 default:
-                    NSAssert(NO, @"WTF");
+                    NSAssert(NO, @"WTF unexpected _currentOpeningToken.type");
                     break;
             }
             
-            NSAssert(wrapperComponent, @"WTF");
+            NSAssert(wrapperComponent, @"WTF expected wrapperComponent");
             [_tagValueStack removeLastObject];
             self.currentTagValue = [_tagValueStack lastObject];
             

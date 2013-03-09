@@ -100,16 +100,54 @@
         case GRMustacheBufferInputTypeStrippableContent:
             if (string.length > 0) {
                 if (self.prefix) {
-                    [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlank];
-                    self.prefix = nil;
+                    if ([string characterAtIndex:0] == '\n') {
+                        string = [string substringFromIndex:1];
+                        self.prefix = nil;
+                    } else if ([string characterAtIndex:0] == '\r' && string.length >= 2 && [string characterAtIndex:1] == '\n') {
+                        string = [string substringFromIndex:2];
+                        self.prefix = nil;
+                    } else {
+                        [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlank];
+                        self.prefix = nil;
+                    }
+                } else if (_atLineStart) {
+                    if ([string characterAtIndex:0] == '\n') {
+                        string = [string substringFromIndex:1];
+                    } else if ([string characterAtIndex:0] == '\r' && string.length >= 2 && [string characterAtIndex:1] == '\n') {
+                        string = [string substringFromIndex:2];
+                    }
                 }
-                [self appendSafeString:string inputType:inputType];
-                _atLineStart = NO;
-                return string;
+                NSRange blankRange = [string rangeOfCharacterFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] options:NSBackwardsSearch|NSAnchoredSearch];
+                if (blankRange.location != NSNotFound) {
+                    NSRange whiteSpaceRange = [string rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet] options:NSBackwardsSearch|NSAnchoredSearch];
+                    if (whiteSpaceRange.location == NSNotFound) {
+                        whiteSpaceRange.location = string.length;
+                        whiteSpaceRange.length = 0;
+                    }
+                    if (whiteSpaceRange.location != blankRange.location) {
+                        self.prefix = [string substringWithRange:whiteSpaceRange];
+                        string = [string substringWithRange:(NSRange){ .location = 0, .length = whiteSpaceRange.location }];
+                        [self appendSafeString:string inputType:inputType];
+                        _atLineStart = NO;
+                        _flushablePrefix = YES;
+                        return string;
+                    } else {
+                        [self appendSafeString:string inputType:inputType];
+                        _atLineStart = NO;
+                        return string;
+                    }
+                } else {
+                    [self appendSafeString:string inputType:inputType];
+                    _atLineStart = NO;
+                    return string;
+                }
             } else {
                 if (_atLineStart) {
                     self.prefix = @"";
+                    _flushablePrefix = YES;
                     _atLineStart = NO;
+                } else {
+                    _flushablePrefix = NO;
                 }
                 return @"";
             }
@@ -138,9 +176,11 @@
             if (_atLineStart) {
                 self.prefix = string;
                 _atLineStart = NO;
+                _flushablePrefix = YES;
                 return string;
             } else if (self.prefix) {
                 self.prefix = [self.prefix stringByAppendingString:string];
+                _flushablePrefix = NO;
                 return string;
             } else {
                 [self appendSafeString:string inputType:inputType];
@@ -173,7 +213,7 @@
 
 - (void)flush
 {
-    if (self.prefix) {
+    if (self.prefix && _flushablePrefix) {
         [self appendSafeString:self.prefix inputType:GRMustacheBufferInputTypeBlank];
         self.prefix = nil;
     }

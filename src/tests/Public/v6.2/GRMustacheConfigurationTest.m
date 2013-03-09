@@ -105,8 +105,8 @@ static BOOL defaultConfigurationHasBeenTouched = NO;
     }];
     id data = @{@"object": object};
     [GRMustacheTemplate renderObject:data fromString:@"{{object}}" error:NULL];
-    STAssertTrue(testedHTMLSafeDefined, @"WTF");
-    STAssertTrue(testedHTMLSafe, @"WTF");
+    STAssertTrue(testedHTMLSafeDefined, @"");
+    STAssertTrue(testedHTMLSafe, @"");
 }
 
 - (void)testDefaultConfigurationContentTypeTextHasTemplateRenderHTMLUnsafeStrings
@@ -131,8 +131,8 @@ static BOOL defaultConfigurationHasBeenTouched = NO;
     }];
     id data = @{@"object": object};
     [GRMustacheTemplate renderObject:data fromString:@"{{object}}" error:NULL];
-    STAssertTrue(testedHTMLSafeDefined, @"WTF");
-    STAssertFalse(testedHTMLSafe, @"WTF");
+    STAssertTrue(testedHTMLSafeDefined, @"");
+    STAssertFalse(testedHTMLSafe, @"");
 }
 
 - (void)testDefaultConfigurationContentTypeHTMLHasSectionTagRenderHTMLSafeStrings
@@ -149,8 +149,8 @@ static BOOL defaultConfigurationHasBeenTouched = NO;
     }];
     id data = @{@"object": object};
     [GRMustacheTemplate renderObject:data fromString:@"{{#object}}{{/object}}" error:NULL];
-    STAssertTrue(testedHTMLSafeDefined, @"WTF");
-    STAssertTrue(testedHTMLSafe, @"WTF");
+    STAssertTrue(testedHTMLSafeDefined, @"");
+    STAssertTrue(testedHTMLSafe, @"");
 }
 
 - (void)testDefaultConfigurationContentTypeTextHasSectionTagRenderHTMLUnsafeStrings
@@ -167,8 +167,8 @@ static BOOL defaultConfigurationHasBeenTouched = NO;
     }];
     id data = @{@"object": object};
     [GRMustacheTemplate renderObject:data fromString:@"{{#object}}{{/object}}" error:NULL];
-    STAssertTrue(testedHTMLSafeDefined, @"WTF");
-    STAssertFalse(testedHTMLSafe, @"WTF");
+    STAssertTrue(testedHTMLSafeDefined, @"");
+    STAssertFalse(testedHTMLSafe, @"");
 }
 
 - (void)testDefaultConfigurationContentTypeHTMLHasVariableTagRenderHTMLSafeStrings
@@ -185,8 +185,8 @@ static BOOL defaultConfigurationHasBeenTouched = NO;
     }];
     id data = @{@"object": object};
     [GRMustacheTemplate renderObject:data fromString:@"{{object}}" error:NULL];
-    STAssertTrue(testedHTMLSafeDefined, @"WTF");
-    STAssertTrue(testedHTMLSafe, @"WTF");
+    STAssertTrue(testedHTMLSafeDefined, @"");
+    STAssertTrue(testedHTMLSafe, @"");
 }
 
 - (void)testDefaultConfigurationContentTypeTextHasVariableTagRenderHTMLUnsafeStrings
@@ -203,8 +203,8 @@ static BOOL defaultConfigurationHasBeenTouched = NO;
     }];
     id data = @{@"object": object};
     [GRMustacheTemplate renderObject:data fromString:@"{{object}}" error:NULL];
-    STAssertTrue(testedHTMLSafeDefined, @"WTF");
-    STAssertFalse(testedHTMLSafe, @"WTF");
+    STAssertTrue(testedHTMLSafeDefined, @"");
+    STAssertFalse(testedHTMLSafe, @"");
 }
 
 - (void)testCONTENT_TYPE_TEXTPragmaTagOverridesDefaultConfigurationContentTypeHTML

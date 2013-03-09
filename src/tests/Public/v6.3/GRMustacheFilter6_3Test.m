@@ -42,7 +42,7 @@
         STAssertNotNil(template, @"");
         NSError *error;
         NSString *rendering = [template renderObject:data error:&error];
-        STAssertNil(rendering, @"WTF");
+        STAssertNil(rendering, @"");
         STAssertEqualObjects(error.domain, GRMustacheErrorDomain, @"");
         STAssertEquals(error.code, GRMustacheErrorCodeRenderingError, @"");
     }
@@ -51,7 +51,7 @@
         STAssertNotNil(template, @"");
         NSError *error;
         NSString *rendering = [template renderObject:data error:&error];
-        STAssertNil(rendering, @"WTF");
+        STAssertNil(rendering, @"");
         STAssertEqualObjects(error.domain, GRMustacheErrorDomain, @"");
         STAssertEquals(error.code, GRMustacheErrorCodeRenderingError, @"");
     }
@@ -60,7 +60,7 @@
         STAssertNotNil(template, @"");
         NSError *error;
         NSString *rendering = [template renderObject:data error:&error];
-        STAssertNil(rendering, @"WTF");
+        STAssertNil(rendering, @"");
         STAssertEqualObjects(error.domain, GRMustacheErrorDomain, @"");
         STAssertEquals(error.code, GRMustacheErrorCodeRenderingError, @"");
     }
@@ -69,7 +69,7 @@
         STAssertNotNil(template, @"");
         NSError *error;
         NSString *rendering = [template renderObject:data error:&error];
-        STAssertNil(rendering, @"WTF");
+        STAssertNil(rendering, @"");
         STAssertEqualObjects(error.domain, GRMustacheErrorDomain, @"");
         STAssertEquals(error.code, GRMustacheErrorCodeRenderingError, @"");
     }
@@ -86,7 +86,7 @@
     STAssertNotNil(template, @"");
     NSError *error;
     NSString *rendering = [template renderObject:data error:&error];
-    STAssertNil(rendering, @"WTF");
+    STAssertNil(rendering, @"");
     STAssertEqualObjects(error.domain, GRMustacheErrorDomain, @"");
     STAssertEquals(error.code, GRMustacheErrorCodeRenderingError, @"");
 }

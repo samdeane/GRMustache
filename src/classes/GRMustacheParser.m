@@ -157,6 +157,20 @@
                     start = i;
                     state = stateSpaceRun;
                 }
+                else if (c == '\r' && i+1 < length && characters[i+1] == '\n')
+                {
+                    // Blank end of line
+                    GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankEndOfLine
+                                                             templateString:templateString
+                                                                 templateID:templateID
+                                                                       line:lineNumber
+                                                                      range:(NSRange){ .location = start, .length = (i+2)-start}];
+                    if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
+                    ++lineNumber;
+                    lineStart = start = i + 2;
+                    state = stateStart;
+                    i += 1;
+                }
                 else if (c == '\n')
                 {
                     // Blank end of line
@@ -201,6 +215,20 @@
             case stateSpaceRun: {
                 if (c == ' ' || c == '\t')
                 {
+                }
+                else if (c == '\r' && i+1 < length && characters[i+1] == '\n')
+                {
+                    // Blank end of line
+                    GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeBlankEndOfLine
+                                                             templateString:templateString
+                                                                 templateID:templateID
+                                                                       line:lineNumber
+                                                                      range:(NSRange){ .location = start, .length = (i+2)-start}];
+                    if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
+                    ++lineNumber;
+                    lineStart = start = i + 2;
+                    state = stateStart;
+                    i += 1;
                 }
                 else if (c == '\n')
                 {
@@ -270,7 +298,23 @@
             } break;
                 
             case stateContent: {
-                if (c == '\n')
+                if (c == '\r' && i+1 < length && characters[i+1] == '\n')
+                {
+                    if (start != (i+1)) {
+                        // Content
+                        GRMustacheToken *token = [GRMustacheToken tokenWithType:GRMustacheTokenTypeContentEndOfLine
+                                                                 templateString:templateString
+                                                                     templateID:templateID
+                                                                           line:lineNumber
+                                                                          range:(NSRange){ .location = start, .length = (i+2)-start}];
+                        if (![self.delegate parser:self shouldContinueAfterParsingToken:token]) return;
+                    }
+                    ++lineNumber;
+                    lineStart = start = i + 2;
+                    state = stateStart;
+                    i += 1;
+                }
+                else if (c == '\n')
                 {
                     if (start != (i+1)) {
                         // Content
@@ -595,7 +639,7 @@
                         break;
                         
                     case '.':
-                        NSAssert(currentExpression == nil, @"WTF");
+                        NSAssert(currentExpression == nil, @"WTF expected nil currentExpression");
                         state = stateLeadingDot;
                         currentExpression = [GRMustacheImplicitIteratorExpression expression];
                         break;
@@ -648,7 +692,7 @@
                         break;
                         
                     case '(': {
-                        NSAssert(currentExpression, @"WTF");
+                        NSAssert(currentExpression, @"WTF expected currentExpression");
                         state = stateInitial;
                         [filterExpressionStack addObject:currentExpression];
                         currentExpression = nil;
@@ -656,8 +700,8 @@
                         
                     case ')':
                         if (filterExpressionStack.count > 0) {
-                            NSAssert(currentExpression, @"WTF");
-                            NSAssert(filterExpressionStack.count > 0, @"WTF");
+                            NSAssert(currentExpression, @"WTF expected currentExpression");
+                            NSAssert(filterExpressionStack.count > 0, @"WTF expected non empty filterExpressionStack");
                             
                             state = stateFilterDone;
                             GRMustacheExpression *filterExpression = [filterExpressionStack lastObject];
@@ -670,8 +714,8 @@
                         
                     case ',':
                         if (filterExpressionStack.count > 0) {
-                            NSAssert(currentExpression, @"WTF");
-                            NSAssert(filterExpressionStack.count > 0, @"WTF");
+                            NSAssert(currentExpression, @"WTF expected currentExpression");
+                            NSAssert(filterExpressionStack.count > 0, @"WTF expected non empty filterExpressionStack");
                             
                             state = stateInitial;
                             GRMustacheExpression *filterExpression = [filterExpressionStack lastObject];
@@ -743,7 +787,7 @@
                             currentExpression = [GRMustacheIdentifierExpression expressionWithIdentifier:identifier];
                         }
                         
-                        NSAssert(currentExpression, @"WTF");
+                        NSAssert(currentExpression, @"WTF expected currentExpression");
                         state = stateInitial;
                         [filterExpressionStack addObject:currentExpression];
                         currentExpression = nil;
@@ -759,8 +803,8 @@
                         }
                         
                         if (filterExpressionStack.count > 0) {
-                            NSAssert(currentExpression, @"WTF");
-                            NSAssert(filterExpressionStack.count > 0, @"WTF");
+                            NSAssert(currentExpression, @"WTF expected currentExpression");
+                            NSAssert(filterExpressionStack.count > 0, @"WTF expected non empty filterExpressionStack");
                             state = stateFilterDone;
                             GRMustacheExpression *filterExpression = [filterExpressionStack lastObject];
                             [filterExpressionStack removeLastObject];
@@ -780,8 +824,8 @@
                         }
                         
                         if (filterExpressionStack.count > 0) {
-                            NSAssert(currentExpression, @"WTF");
-                            NSAssert(filterExpressionStack.count > 0, @"WTF");
+                            NSAssert(currentExpression, @"WTF expected currentExpression");
+                            NSAssert(filterExpressionStack.count > 0, @"WTF expected non empty filterExpressionStack");
                             state = stateInitial;
                             GRMustacheExpression *filterExpression = [filterExpressionStack lastObject];
                             [filterExpressionStack removeLastObject];
@@ -858,7 +902,7 @@
                         break;
                         
                     case '(':
-                        NSAssert(currentExpression, @"WTF");
+                        NSAssert(currentExpression, @"WTF expected currentExpression");
                         state = stateInitial;
                         [filterExpressionStack addObject:currentExpression];
                         currentExpression = nil;
@@ -866,8 +910,8 @@
                         
                     case ')':
                         if (filterExpressionStack.count > 0) {
-                            NSAssert(currentExpression, @"WTF");
-                            NSAssert(filterExpressionStack.count > 0, @"WTF");
+                            NSAssert(currentExpression, @"WTF expected currentExpression");
+                            NSAssert(filterExpressionStack.count > 0, @"WTF expected non empty filterExpressionStack");
                             state = stateFilterDone;
                             GRMustacheExpression *filterExpression = [filterExpressionStack lastObject];
                             [filterExpressionStack removeLastObject];
@@ -879,8 +923,8 @@
                         
                     case ',':
                         if (filterExpressionStack.count > 0) {
-                            NSAssert(currentExpression, @"WTF");
-                            NSAssert(filterExpressionStack.count > 0, @"WTF");
+                            NSAssert(currentExpression, @"WTF expected currentExpression");
+                            NSAssert(filterExpressionStack.count > 0, @"WTF expected non empty filterExpressionStack");
                             state = stateInitial;
                             GRMustacheExpression *filterExpression = [filterExpressionStack lastObject];
                             [filterExpressionStack removeLastObject];
@@ -910,7 +954,7 @@
                         break;
                         
                     case '(':
-                        NSAssert(currentExpression, @"WTF");
+                        NSAssert(currentExpression, @"WTF expected currentExpression");
                         state = stateInitial;
                         [filterExpressionStack addObject:currentExpression];
                         currentExpression = nil;
@@ -918,8 +962,8 @@
                         
                     case ')':
                         if (filterExpressionStack.count > 0) {
-                            NSAssert(currentExpression, @"WTF");
-                            NSAssert(filterExpressionStack.count > 0, @"WTF");
+                            NSAssert(currentExpression, @"WTF expected currentExpression");
+                            NSAssert(filterExpressionStack.count > 0, @"WTF expected non empty filterExpressionStack");
                             state = stateFilterDone;
                             GRMustacheExpression *filterExpression = [filterExpressionStack lastObject];
                             [filterExpressionStack removeLastObject];
@@ -931,8 +975,8 @@
                         
                     case ',':
                         if (filterExpressionStack.count > 0) {
-                            NSAssert(currentExpression, @"WTF");
-                            NSAssert(filterExpressionStack.count > 0, @"WTF");
+                            NSAssert(currentExpression, @"WTF expected currentExpression");
+                            NSAssert(filterExpressionStack.count > 0, @"WTF expected non empty filterExpressionStack");
                             state = stateInitial;
                             GRMustacheExpression *filterExpression = [filterExpressionStack lastObject];
                             [filterExpressionStack removeLastObject];
@@ -949,7 +993,7 @@
                 }
                 break;
             default:
-                NSAssert(NO, @"WTF");
+                NSAssert(NO, @"WTF unexpected state");
                 break;
         }
     }
@@ -968,7 +1012,7 @@
             
         case stateLeadingDot:
             if (filterExpressionStack.count == 0) {
-                NSAssert(currentExpression, @"WTF");
+                NSAssert(currentExpression, @"WTF expected currentExpression");
                 validExpression = currentExpression;
                 state = stateValid;
             } else {
@@ -986,7 +1030,7 @@
             }
             
             if (filterExpressionStack.count == 0) {
-                NSAssert(currentExpression, @"WTF");
+                NSAssert(currentExpression, @"WTF expected currentExpression");
                 validExpression = currentExpression;
                 state = stateValid;
             } else {
@@ -1000,7 +1044,7 @@
             
         case stateIdentifierDone:
             if (filterExpressionStack.count == 0) {
-                NSAssert(currentExpression, @"WTF");
+                NSAssert(currentExpression, @"WTF expected currentExpression");
                 validExpression = currentExpression;
                 state = stateValid;
             } else {
@@ -1010,7 +1054,7 @@
             
         case stateFilterDone:
             if (filterExpressionStack.count == 0) {
-                NSAssert(currentExpression, @"WTF");
+                NSAssert(currentExpression, @"WTF expected currentExpression");
                 validExpression = currentExpression;
                 state = stateValid;
             } else {
@@ -1022,7 +1066,7 @@
             break;
             
         default:
-            NSAssert(NO, @"WTF");
+            NSAssert(NO, @"WTF unexpected state");
             break;
     }
     
@@ -1043,11 +1087,11 @@
             return nil;
             
         case stateValid:
-            NSAssert(validExpression, @"WTF");
+            NSAssert(validExpression, @"WTF expected validExpression");
             return validExpression;
             
         default:
-            NSAssert(NO, @"WTF");
+            NSAssert(NO, @"WTF unespected state");
             break;
     }
     

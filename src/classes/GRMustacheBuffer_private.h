@@ -40,6 +40,7 @@ typedef NS_ENUM(NSInteger, GRMustacheBufferInputType) {
     GRMustacheContentType _contentType;
     NSString *_prefix;
     BOOL _atLineStart;
+    BOOL _flushablePrefix;
 }
 
 /**

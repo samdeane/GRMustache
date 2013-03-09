@@ -225,10 +225,10 @@
                     // promote
                     renderingContentType = GRMustacheContentTypeHTML;
                 }
-                if (self.templateRepository.configuration.stripsBlankLines) {
-                    rendering = [buffer appendString:rendering contentType:renderingContentType inputType:GRMustacheBufferInputTypeStrippableContent];
-                } else {
+                if (self.type == GRMustacheTagTypeVariable && !self.templateRepository.configuration.stripsBlankLines) {
                     rendering = [buffer appendString:rendering contentType:renderingContentType inputType:GRMustacheBufferInputTypeContent];
+                } else {
+                    rendering = [buffer appendString:rendering contentType:renderingContentType inputType:GRMustacheBufferInputTypeStrippableContent];
                 }
                 
                 // Tag delegates post-rendering callbacks

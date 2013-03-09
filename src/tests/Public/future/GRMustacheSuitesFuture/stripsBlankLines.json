@@ -226,45 +226,52 @@
     },
     {
       "configuration": { "stripsBlankLines" : true },
-      "name": "Lines containing a single empty variable tag prefixed by white space are rendered if they don't end with a new line.",
+      "name": "Lines containing a single empty variable tag prefixed by white space are not rendered even if they don't end with a new line.",
       "data": { "present": "---" },
       "template": "  {{present}}\n  {{missing}}",
-      "expected": "  ---\n  "
+      "expected": "  ---\n"
     },
     {
       "configuration": { "stripsBlankLines" : true },
-      "name": "Lines containing a single empty variable tag prefixed by white space are rendered if they don't end with a new line.",
+      "name": "Lines containing a single empty variable tag prefixed by white space are not rendered even if they don't end with a new line.",
       "data": { },
       "template": "  ---\n  {{missing}}",
-      "expected": "  ---\n  "
+      "expected": "  ---\n"
     },
     {
       "configuration": { "stripsBlankLines" : true },
-      "name": "Lines containing a single empty variable tag followed by white space are rendered if they don't end with a new line.",
+      "name": "Lines containing a single empty variable tag followed by white space are not rendered even if they don't end with a new line.",
       "data": { "present": "---" },
       "template": "{{present}}  \n{{missing}}  ",
-      "expected": "---  \n  "
+      "expected": "---  \n"
     },
     {
       "configuration": { "stripsBlankLines" : true },
-      "name": "Lines containing a single empty variable tag followed by white space are rendered if they don't end with a new line.",
+      "name": "Lines containing a single empty variable tag followed by white space are not rendered even if they don't end with a new line.",
       "data": { },
       "template": "---  \n{{missing}}  ",
-      "expected": "---  \n  "
+      "expected": "---  \n"
     },
     {
       "configuration": { "stripsBlankLines" : true },
-      "name": "Lines containing a single empty variable tag surrounded by white space are rendered if they don't end with a new line.",
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered even if they don't end with a new line.",
       "data": { "present": "---" },
       "template": "  {{present}}  \n  {{missing}}  ",
-      "expected": "  ---  \n    "
+      "expected": "  ---  \n"
     },
     {
       "configuration": { "stripsBlankLines" : true },
-      "name": "Lines containing a single empty variable tag surrounded by white space are rendered if they don't end with a new line.",
+      "name": "Lines containing a single empty variable tag surrounded by white space are not rendered even if they don't end with a new line.",
       "data": { },
       "template": "  ---  \n  {{missing}}  ",
-      "expected": "  ---  \n    "
+      "expected": "  ---  \n"
+    },
+    {
+      "configuration": { "stripsBlankLines" : true },
+      "name": "Lines containing containing white spaces are rendered even if they don't end with a new line.",
+      "data": { "present": "---" },
+      "template": "  {{present}}\n  ",
+      "expected": "  ---\n  "
     },
     {
       // first failing example from https://github.com/groue/GRMustache/issues/46#issuecomment-14354838

@@ -62,7 +62,7 @@
 
 - (id)initWithString:(NSString *)string inputType:(GRMustacheBufferInputType)inputType
 {
-    NSAssert(string, @"WTF");
+    NSAssert(string, @"WTF expected string");
     self = [self init];
     if (self) {
         self.string = string;
