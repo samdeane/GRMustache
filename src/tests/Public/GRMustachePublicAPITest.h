@@ -28,7 +28,7 @@
 
 @interface GRMustachePublicAPISuiteTest: GRMustachePublicAPITest
 - (void)runTestsFromResource:(NSString *)name subdirectory:(NSString *)subpath;
-- (GRMustacheTemplate *)templateForTemplateString:(NSString *)templateString partialsDictionary:(NSDictionary *)partialsDictionary error:(NSError **)error;
-- (GRMustacheTemplate *)templateForTemplateNamed:(NSString *)templateName templatesPath:(NSString *)templatesPath encoding:(NSStringEncoding)encoding error:(NSError **)error;
-- (GRMustacheTemplate *)templateForTemplateNamed:(NSString *)templateName templatesURL:(NSURL *)templatesURL encoding:(NSStringEncoding)encoding error:(NSError **)error;
+- (GRMustacheTemplate *)templateForTemplateString:(NSString *)templateString partialsDictionary:(NSDictionary *)partialsDictionary configuration:(GRMustacheConfiguration *)configuration error:(NSError **)error;
+- (GRMustacheTemplate *)templateForTemplateNamed:(NSString *)templateName templatesPath:(NSString *)templatesPath encoding:(NSStringEncoding)encoding configuration:(GRMustacheConfiguration *)configuration error:(NSError **)error;
+- (GRMustacheTemplate *)templateForTemplateNamed:(NSString *)templateName templatesURL:(NSURL *)templatesURL encoding:(NSStringEncoding)encoding configuration:(GRMustacheConfiguration *)configuration error:(NSError **)error;
 @end

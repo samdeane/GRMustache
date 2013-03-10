@@ -117,29 +117,45 @@
                         string = [string substringFromIndex:2];
                     }
                 }
-                NSRange blankRange = [string rangeOfCharacterFromSet:[NSCharacterSet whitespaceAndNewlineCharacterSet] options:NSBackwardsSearch|NSAnchoredSearch];
-                if (blankRange.location != NSNotFound) {
-                    NSRange whiteSpaceRange = [string rangeOfCharacterFromSet:[NSCharacterSet whitespaceCharacterSet] options:NSBackwardsSearch|NSAnchoredSearch];
-                    if (whiteSpaceRange.location == NSNotFound) {
-                        whiteSpaceRange.location = string.length;
-                        whiteSpaceRange.length = 0;
+                NSUInteger prefixIndex = NSNotFound;
+                if (string.length > 0) {
+                    prefixIndex = [string length]-1;
+                    for (NSUInteger i = prefixIndex;;--i) {
+                        unichar c = [string characterAtIndex:i];
+                        if (c == ' ' || c == '\t') {
+                            prefixIndex = i;
+                        } else if (c == '\n') {
+                            prefixIndex = i + 1;
+                            break;
+                        } else {
+                            prefixIndex = NSNotFound;
+                            break;
+                        }
+                        if (i == 0) {
+                            break;
+                        }
                     }
-                    if (whiteSpaceRange.location != blankRange.location) {
-                        self.prefix = [string substringWithRange:whiteSpaceRange];
-                        string = [string substringWithRange:(NSRange){ .location = 0, .length = whiteSpaceRange.location }];
-                        [self appendSafeString:string inputType:inputType];
-                        _atLineStart = NO;
-                        _flushablePrefix = YES;
-                        return string;
-                    } else {
-                        [self appendSafeString:string inputType:inputType];
-                        _atLineStart = NO;
-                        return string;
-                    }
-                } else {
+                }
+                if (prefixIndex != NSNotFound) {
+                    self.prefix = [string substringFromIndex:prefixIndex];
+                    string = [string substringWithRange:(NSRange){ .location = 0, .length = prefixIndex }];
+                    [self appendSafeString:string inputType:inputType];
+                    _atLineStart = NO;
+                    _flushablePrefix = YES;
+                    return string;
+                } else if (string.length > 0) {
                     [self appendSafeString:string inputType:inputType];
                     _atLineStart = NO;
                     return string;
+                } else {
+                    if (_atLineStart) {
+                        self.prefix = @"";
+                        _flushablePrefix = YES;
+                        _atLineStart = NO;
+                    } else {
+                        _flushablePrefix = NO;
+                    }
+                    return @"";
                 }
             } else {
                 if (_atLineStart) {

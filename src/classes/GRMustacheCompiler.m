@@ -213,9 +213,8 @@
     switch (token.type) {
         case GRMustacheTokenTypeSetDelimiter:
         case GRMustacheTokenTypeComment:
-            // ignore
-//            // insert strippable text component
-//            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:@"" inputType:GRMustacheBufferInputTypeStrippableContent]];
+            // insert empty blank
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:@"" inputType:GRMustacheBufferInputTypeBlank]];
             break;
             
         case GRMustacheTokenTypePragma: {
@@ -234,6 +233,8 @@
                 }
                 _contentType = GRMustacheContentTypeHTML;
             }
+            // insert empty blank
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:@"" inputType:GRMustacheBufferInputTypeBlank]];
         } break;
             
         case GRMustacheTokenTypeContent:
@@ -259,7 +260,11 @@
             NSAssert(token.templateSubstring.length > 0, @"WTF empty GRMustacheTokenTypeBlank");
             
             // Success: append GRMustacheTextComponent
-            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlank]];
+            if (_currentComponents.count == 0 && _componentsStack.count > 1) {
+                [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeContent]];
+            } else {
+                [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:token.templateSubstring inputType:GRMustacheBufferInputTypeBlank]];
+            }
             break;
             
         case GRMustacheTokenTypeBlankEndOfLine:
@@ -582,6 +587,7 @@
             self.currentComponents = [_componentsStack lastObject];
             
             [_currentComponents addObject:wrapperComponent];
+            [_currentComponents addObject:[GRMustacheTextComponent textComponentWithString:@"" inputType:GRMustacheBufferInputTypeStrippableContent]];
         } break;
             
             

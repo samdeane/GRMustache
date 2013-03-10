@@ -66,11 +66,11 @@
         GRMustacheTemplate *template = [repository templateFromString:templateString error:NULL];
         NSString *rendering = [template renderObject:data error:NULL];
         
-        // GRMustache doesn't care about white space rules of the Mustache specification.
-        // Compare rendering and expected rendering, but ignoring white space.
-        NSCharacterSet *w = [NSCharacterSet whitespaceAndNewlineCharacterSet];
-        rendering = [[rendering componentsSeparatedByCharactersInSet:w] componentsJoinedByString:@""];
-        expected = [[expected componentsSeparatedByCharactersInSet:w] componentsJoinedByString:@""];
+//        // GRMustache doesn't care about white space rules of the Mustache specification.
+//        // Compare rendering and expected rendering, but ignoring white space.
+//        NSCharacterSet *w = [NSCharacterSet whitespaceAndNewlineCharacterSet];
+//        rendering = [[rendering componentsSeparatedByCharactersInSet:w] componentsJoinedByString:@""];
+//        expected = [[expected componentsSeparatedByCharactersInSet:w] componentsJoinedByString:@""];
         
         STAssertEqualObjects(rendering, expected, @"Failed specification test in suite %@: %@", path, test);
         
