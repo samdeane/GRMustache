@@ -111,7 +111,8 @@
     }
     
     if (![object isKindOfClass:[NSDictionary class]] && [object respondsToSelector:@selector(countByEnumeratingWithState:objects:count:)]) {
-        for (id _ in object) {
+        for (id unused in object) {
+            (void)unused;
             return [NSNumber numberWithBool:NO];
         }
         return [NSNumber numberWithBool:YES];
@@ -138,7 +139,8 @@
     }
     
     if (![object isKindOfClass:[NSDictionary class]] && [object respondsToSelector:@selector(countByEnumeratingWithState:objects:count:)]) {
-        for (id _ in object) {
+        for (id unused in object) {
+            (void)unused;
             return [NSNumber numberWithBool:NO];
         }
         return [NSNumber numberWithBool:YES];

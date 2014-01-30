@@ -570,6 +570,7 @@ static NSString *GRMustacheRenderNSFastEnumeration(id<NSFastEnumeration> self, S
             
             BOOL empty = YES;
             for (id item in self) {
+                (void)item;
                 empty = NO;
                 break;
             }
