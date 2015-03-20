@@ -2076,6 +2076,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = include/GRMustache;
+				SKIP_INSTALL = YES;
 			};
 			name = Debug;
 		};
@@ -2089,6 +2090,7 @@
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PUBLIC_HEADERS_FOLDER_PATH = include/GRMustache;
+				SKIP_INSTALL = YES;
 			};
 			name = Release;
 		};
