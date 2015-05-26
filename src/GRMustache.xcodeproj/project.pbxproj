@@ -1397,7 +1397,7 @@
 			name = "GRMustache6-iOS-arm64-Tests";
 			productName = "GRMustache6-iOSTests";
 			productReference = 56A731681805276A00B8570A /* GRMustache6-iOS-arm64-Tests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 		56DEC247152631040031E8DC /* GRMustache6-MacOS */ = {
 			isa = PBXNativeTarget;
@@ -1433,7 +1433,7 @@
 			name = "GRMustache6-MacOSTests";
 			productName = "GRMustache6-MacOSTests";
 			productReference = 56DEC255152631040031E8DC /* GRMustache6-MacOSTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 		56DEC26D1526311B0031E8DC /* GRMustache6-iOS */ = {
 			isa = PBXNativeTarget;
@@ -1469,7 +1469,7 @@
 			name = "GRMustache6-iOSTests";
 			productName = "GRMustache6-iOSTests";
 			productReference = 56DEC27B1526311C0031E8DC /* GRMustache6-iOSTests.octest */;
-			productType = "com.apple.product-type.bundle";
+			productType = "com.apple.product-type.bundle.ocunit-test";
 		};
 /* End PBXNativeTarget section */
 
